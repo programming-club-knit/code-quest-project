@@ -4,48 +4,52 @@ import Problem from '../../models/Problem.js';
 
 export const getLeaderboard = async (req, res) => {
     try {
-        // Fetch all verified teams
         const teams = await Team.find({ isVerified: true, isDisqualified: false }).select('_id teamName');
         const activeProblems = await Problem.find({ isActive: true }).select('_id title points');
 
-        // Setup point mapping
         const problemPoints = {};
         activeProblems.forEach(p => {
             problemPoints[p._id.toString()] = p.points;
         });
 
-        // Setup leaderboards array
         const leaderboard = [];
 
         for (const team of teams) {
-            // Find earliest 'Accepted' submission for each unique problem for this team
-            // Using aggregate
-            const acceptedSubmissions = await Submission.aggregate([
-                { $match: { teamId: team._id, verdict: 'Accepted' } },
-                { $sort: { createdAt: 1 } },
-                {
-                    $group: {
-                        _id: '$problemId',
-                        firstSolvedAt: { $first: '$createdAt' },
-                        submissionId: { $first: '$_id' }
-                    }
-                }
-            ]);
+            const allSubmissions = await Submission.find({ teamId: team._id }).sort({ createdAt: 1 });
 
             let totalScore = 0;
-            let latestSolveTime = 0; // we will use absolute ms epoch time. Alternatively, max solve time.
-
+            let latestSolveTime = 0;
             const problemsSolvedByTeam = {};
+            const failedCounts = {}; 
 
-            for (const sub of acceptedSubmissions) {
-                const pId = sub._id.toString();
-                if (problemPoints[pId]) {
-                    totalScore += problemPoints[pId];
+            const PENALTY_PER_FAIL = 15; 
+
+            for (const sub of allSubmissions) {
+                const pId = sub.problemId.toString();
+
+                if (problemsSolvedByTeam[pId]) {
+                    continue; 
+                }
+
+                if (sub.verdict === 'Accepted') {
                     problemsSolvedByTeam[pId] = true;
-                    const solveTimeNum = new Date(sub.firstSolvedAt).getTime();
-                    if (solveTimeNum > latestSolveTime) {
-                        latestSolveTime = solveTimeNum;
+
+                    if (problemPoints[pId]) {
+                        const baseScore = problemPoints[pId];
+                        const penalty = (failedCounts[pId] || 0) * PENALTY_PER_FAIL;
+                        
+                        let earnedScore = baseScore - penalty;
+                        if (earnedScore < 0) earnedScore = 0;
+
+                        totalScore += earnedScore;
+
+                        const solveTimeNum = new Date(sub.createdAt).getTime(); 
+                        if (solveTimeNum > latestSolveTime) {
+                            latestSolveTime = solveTimeNum;
+                        }
                     }
+                } else if (sub.verdict === 'Failed') {
+                    failedCounts[pId] = (failedCounts[pId] || 0) + 1;
                 }
             }
 
@@ -54,11 +58,10 @@ export const getLeaderboard = async (req, res) => {
                 teamName: team.teamName,
                 score: totalScore,
                 latestSolveTime,
-                problems: problemsSolvedByTeam // to display on UI if needed
+                problems: problemsSolvedByTeam
             });
         }
 
-        // Sort leaderboard: score DESC, latestSolveTime ASC
         leaderboard.sort((a, b) => {
             if (b.score !== a.score) {
                 return b.score - a.score;
@@ -66,7 +69,6 @@ export const getLeaderboard = async (req, res) => {
             return a.latestSolveTime - b.latestSolveTime;
         });
 
-        // Add rank
         let rank = 1;
         leaderboard.forEach((entry, index) => {
             if (index > 0) {
@@ -84,7 +86,7 @@ export const getLeaderboard = async (req, res) => {
 
         res.status(200).json({
             leaderboard,
-            problems: activeProblems.map(p => ({ id: p._id, title: p.title }))
+            problems: activeProblems.map(p => ({ id: p._id, title: p.title }))  
         });
     } catch (error) {
         console.error('Error fetching leaderboard:', error);

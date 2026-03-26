@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { io } from 'socket.io-client';
 import AdminNavbar from '../../components/AdminNavbar';
 
 const AdminLeaderboard = () => {
@@ -24,15 +23,6 @@ const AdminLeaderboard = () => {
 
     useEffect(() => {
         fetchLeaderboard();
-
-        const socket = io(import.meta.env.VITE_API_URL.replace('/api', ''));
-        socket.on('leaderboardUpdate', () => {
-            fetchLeaderboard();
-        });
-
-        return () => {
-            socket.disconnect();
-        };
     }, []);
 
     const handleDisqualify = async (teamId) => {

@@ -2,7 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
-import { io } from 'socket.io-client';
+
+const languageMap = {
+    54: 'GNU C++20',
+    62: 'Java 17',
+    71: 'Python 3',
+    63: 'Node.js'
+};
 
 const SubmissionsPage = () => {
     const navigate = useNavigate();
@@ -10,7 +16,8 @@ const SubmissionsPage = () => {
 
     const fetchSubmissions = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/submissions', {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/submissions`, {
+                withCredentials: true,
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
             });
             // The user endpoint returns the array directly
@@ -22,13 +29,6 @@ const SubmissionsPage = () => {
 
     useEffect(() => {
         fetchSubmissions();
-
-        const socket = io('http://localhost:5000');
-        socket.on('submissionsUpdate', () => {
-            fetchSubmissions();
-        });
-
-        return () => socket.disconnect();
     }, []);
 
     const formatDate = (dateString) => {
@@ -64,13 +64,13 @@ const SubmissionsPage = () => {
                                         <td className="py-2 px-2 border-r border-[#eee] text-[#666]">{formatDate(sub.createdAt)}</td>
                                         <td className="py-2 px-2 border-r border-[#eee] text-left">
                                             <a href="#" className="font-bold text-[#FF8C00] hover:underline">
-                                                {sub.teamId?.name || 'Unknown'}
+                                                {sub.teamId?.teamName || 'Unknown'}
                                             </a>
                                         </td>
                                         <td className="py-2 px-2 border-r border-[#eee] text-left text-[#0000cc]">
                                             <a href="#" className="hover:underline">{sub.problemId?.title || 'Unknown'}</a>
                                         </td>
-                                        <td className="py-2 px-2 border-r border-[#eee] text-[#555]">{sub.language}</td>
+                                        <td className="py-2 px-2 border-r border-[#eee] text-[#555]">{languageMap[sub.languageId] || sub.languageId}</td>
                                         <td className={`py-2 px-2 border-r border-[#eee] font-bold ${sub.verdict === 'Accepted' ? 'text-[#00a900]' : sub.verdict.includes('Compilation') ? 'text-[#555]' : 'text-[#cc0000]'}`}>
                                             {sub.verdict}
                                         </td>

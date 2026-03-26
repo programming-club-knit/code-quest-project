@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { io } from 'socket.io-client';
 import Navbar from '../components/Navbar';
 
 const LeaderboardPage = () => {
@@ -26,15 +25,6 @@ const LeaderboardPage = () => {
 
     useEffect(() => {
         fetchLeaderboard();
-
-        const socket = io(import.meta.env.VITE_API_URL.replace('/api', ''));
-        socket.on('leaderboardUpdate', () => {
-            fetchLeaderboard();
-        });
-
-        return () => {
-            socket.disconnect();
-        };
     }, []);
 
     if (loading) {

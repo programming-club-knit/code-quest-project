@@ -106,20 +106,6 @@ export const submitCode = async (req, res) => {
 
         await submission.save();
 
-        if (isSubmissionAccepted === 'Accepted') {
-            const io = req.app.get('io');
-            if (io) {
-                // Let clients know there's a leaderboard update
-                io.emit('leaderboardUpdate');
-            }
-        }
-
-        // Let clients know there's a general submissions update (useful for the admin panel)
-        const io = req.app.get('io');
-        if (io) {
-            io.emit('submissionsUpdate');
-        }
-
         res.status(200).json({
             verdict: isSubmissionAccepted,
             results,

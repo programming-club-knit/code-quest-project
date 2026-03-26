@@ -11,27 +11,7 @@ import problemsRoutes from './modules/problems/problems.routes.js';
 import submissionsRoutes from './modules/submissions/submissions.routes.js';
 import leaderboardRoutes from './modules/leaderboard/leaderboard.routes.js';
 
-import { createServer } from 'http';
-import { Server } from 'socket.io';
-
 const app = express();
-const httpServer = createServer(app);
-
-const io = new Server(httpServer, {
-    cors: {
-        origin: 'http://localhost:5173',
-        credentials: true
-    }
-});
-
-app.set('io', io);
-
-io.on('connection', (socket) => {
-    console.log('A client connected:', socket.id);
-    socket.on('disconnect', () => {
-        console.log('Client disconnected:', socket.id);
-    });
-});
 
 app.use(express.json());
 app.use(cookieParser());
@@ -53,7 +33,7 @@ app.use('/api/leaderboard', leaderboardRoutes);
 
 const PORT = process.env.PORT || 3000;
 
-httpServer.listen(PORT, () => {
+app.listen(PORT, () => {
     console.log("Server is running on : ", PORT);
 });
 

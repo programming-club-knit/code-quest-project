@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { io } from 'socket.io-client';
 import AdminNavbar from '../../components/AdminNavbar';
 
 const languageMap = {
@@ -31,13 +30,6 @@ const AdminSubmissions = () => {
 
     useEffect(() => {
         fetchSubmissions();
-
-        const socket = io(import.meta.env.VITE_API_URL.replace('/api', ''));
-        socket.on('submissionsUpdate', () => {
-            fetchSubmissions();
-        });
-
-        return () => socket.disconnect();
     }, []);
 
     const getVerdictStyle = (verdict) => {

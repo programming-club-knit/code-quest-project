@@ -103,7 +103,7 @@ const AdminRiddles = () => {
             <AdminNavbar activeTab="RIDDLES" />
 
             <div className="w-full max-w-[1200px] flex gap-4 items-start">
-                
+
                 {/* Left col: List */}
                 <div className="flex-2 bg-white border border-[#b9b9b9] text-[13px] shadow-sm rounded-sm">
                     <div className="border-b border-[#b9b9b9] bg-[#e1e1e1] text-[#333] font-bold py-[6px] px-3 rounded-t-[1px]">
@@ -111,7 +111,9 @@ const AdminRiddles = () => {
                     </div>
                     <div className="p-4">
                         {loading ? (
-                            <p>Loading...</p>
+                            <div className="flex justify-center p-4">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0000cc]"></div>
+                            </div>
                         ) : (
                             <table className="w-full border-collapse">
                                 <thead>
@@ -128,7 +130,7 @@ const AdminRiddles = () => {
                                             <td className="py-2 px-2 font-bold text-[#0000cc]">{r.title}</td>
                                             <td className="py-2 px-2"><span className="bg-[#eee] px-1 font-mono text-[11px] border border-[#ccc]">{r.answer}</span></td>
                                             <td className="py-2 px-2">
-                                                <button 
+                                                <button
                                                     onClick={() => toggleStatus(r._id, r.isActive)}
                                                     className={`hover:underline ${r.isActive ? "text-[#00a900]" : "text-[#cc0000]"}`}
                                                 >
@@ -166,12 +168,12 @@ const AdminRiddles = () => {
                             <label className="font-bold text-[#444] mb-1 block">Answer (exact match required):</label>
                             <input type="text" name="answer" value={formData.answer} onChange={handleInputChange} required className="w-full border border-[#ccc] p-1" />
                         </div>
-                        
+
                         <div className="mb-3">
                             <label className="font-bold text-[#444] mb-1 block">Description (Markdown supported):</label>
                             <textarea name="description" value={formData.description} onChange={handleInputChange} required className="w-full border border-[#ccc] p-1 h-[150px] resize-y font-mono text-[12px]"></textarea>
                         </div>
-                        
+
                         <div className="mb-4">
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <input type="checkbox" name="isActive" checked={formData.isActive} onChange={handleInputChange} />

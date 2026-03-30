@@ -79,4 +79,9 @@ const teamSchema = new mongoose.Schema({
 },
     { timestamps: true });
 
+// Basic indexes to speed up dashboards and tracking
+teamSchema.index({ isVerified: 1 });
+teamSchema.index({ isDisqualified: 1 });
+teamSchema.index({ solvedProblems: 1 });
+
 export default mongoose.model('Team', teamSchema);

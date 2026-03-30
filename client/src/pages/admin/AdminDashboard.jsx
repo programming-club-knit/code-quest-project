@@ -9,31 +9,48 @@ const AdminDashboard = () => {
     const [contestStatus, setContestStatus] = useState('loading...');
     const [timeoutMinutes, setTimeoutMinutes] = useState(30);
     const [penaltyMinutes, setPenaltyMinutes] = useState(15);
+    const [contestDurationMinutes, setContestDurationMinutes] = useState(120);
 
-    const stats = {
-        totalTeams: 156,
-        verifiedTeams: 142,
-        pendingTeams: 14,
-        totalSubmissions: 3421,
-        activeProblems: 5,
-        activeRiddles: 10
-    };
+    const [stats, setStats] = useState({
+        totalTeams: 0,
+        verifiedTeams: 0,
+        pendingTeams: 0,
+        totalSubmissions: 0,
+        activeProblems: 0,
+        activeRiddles: 0
+    });
 
-    const fetchStatus = async () => {
+    const fetchStatusAndStats = async () => {
         try {
-            const res = await axios.get(`${API_BASE_URL}/system/status`, { withCredentials: true });
-            setContestStatus(res.data.contestStatus);
-            if (res.data.timeoutMinutes) setTimeoutMinutes(res.data.timeoutMinutes);
-            if (res.data.penaltyMinutes) setPenaltyMinutes(res.data.penaltyMinutes);
+            const [statusRes, statsRes] = await Promise.all([
+                axios.get(`${API_BASE_URL}/system/status`, { withCredentials: true }),
+                axios.get(`${API_BASE_URL}/admin/analytics`, { withCredentials: true })
+            ]);
+
+            setContestStatus(statusRes.data.contestStatus);
+            if (statusRes.data.timeoutMinutes) setTimeoutMinutes(statusRes.data.timeoutMinutes);
+            if (statusRes.data.penaltyMinutes) setPenaltyMinutes(statusRes.data.penaltyMinutes);
+            if (statusRes.data.contestDurationMinutes) setContestDurationMinutes(statusRes.data.contestDurationMinutes);
+
+            if (statsRes.data) {
+                setStats({
+                    totalTeams: statsRes.data.totalTeams || 0,
+                    verifiedTeams: statsRes.data.verifiedTeams || 0,
+                    pendingTeams: statsRes.data.pendingTeams || 0,
+                    totalSubmissions: statsRes.data.totalSubmissions || 0,
+                    activeProblems: statsRes.data.activeProblems || 0,
+                    activeRiddles: statsRes.data.activeRiddles || 0
+                });
+            }
         } catch (error) {
-            console.error('Error fetching contest status', error);
-            toast.error('Failed to get contest status');
-            setContestStatus('error');
+            console.error('Error fetching dashboard data', error);
+            toast.error('Failed to load dashboard data');
+            if (contestStatus === 'loading...') setContestStatus('error');
         }
     };
 
     useEffect(() => {
-        fetchStatus();
+        fetchStatusAndStats();
     }, []);
 
     const updateStatus = async (newStatus) => {
@@ -53,9 +70,10 @@ const AdminDashboard = () => {
         try {
             await axios.put(`${API_BASE_URL}/system/status`, {
                 timeoutMinutes: Number(timeoutMinutes),
-                penaltyMinutes: Number(penaltyMinutes)
+                penaltyMinutes: Number(penaltyMinutes),
+                contestDurationMinutes: Number(contestDurationMinutes)
             }, { withCredentials: true });
-            toast.success('Penalty timers updated successfully');
+            toast.success('Timers updated successfully');
         } catch (error) {
             toast.error('Failed to update timers');
         }
@@ -103,8 +121,13 @@ const AdminDashboard = () => {
                             Contest Controls
                         </div>
                         <div className="p-3 flex flex-col gap-3 text-center">
-                            <div className="font-bold text-sm">
-                                Status: <span className="uppercase text-[#0000cc]">{contestStatus}</span>
+                            <div className="font-bold text-sm flex items-center justify-center gap-2">
+                                Status:
+                                {contestStatus === 'loading...' ? (
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#0000cc]"></div>
+                                ) : (
+                                    <span className="uppercase text-[#0000cc]">{contestStatus}</span>
+                                )}
                             </div>
 
                             {contestStatus === 'not_started' && (
@@ -138,6 +161,10 @@ const AdminDashboard = () => {
 
                             <hr className="my-2 border-[#ccc]" />
                             <div className="text-left flex flex-col gap-2">
+                                <div>
+                                    <label className="text-[12px] font-bold">Contest Duration (mins):</label>
+                                    <input type="number" className="w-full border border-[#ccc] px-2 py-1 mt-1 text-[13px]" value={contestDurationMinutes} onChange={e => setContestDurationMinutes(e.target.value)} />
+                                </div>
                                 <div>
                                     <label className="text-[12px] font-bold">Timeout to Unlock 3rd (mins):</label>
                                     <input type="number" className="w-full border border-[#ccc] px-2 py-1 mt-1 text-[13px]" value={timeoutMinutes} onChange={e => setTimeoutMinutes(e.target.value)} />

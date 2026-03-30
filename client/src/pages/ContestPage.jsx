@@ -11,6 +11,8 @@ const ContestPage = () => {
     const [contestStatus, setContestStatus] = useState('loading');
     const [canUnlockPenalty, setCanUnlockPenalty] = useState(false);
     const [penaltyDeadline, setPenaltyDeadline] = useState(null);
+    const [contestEndTime, setContestEndTime] = useState(null);
+    const [timeLeft, setTimeLeft] = useState('');
 
     const fetchContestData = async () => {
         try {
@@ -18,6 +20,12 @@ const ContestPage = () => {
                 withCredentials: true
             });
             setContestStatus(statusRes.data.contestStatus);
+
+            if (statusRes.data.contestStartTime && statusRes.data.contestDurationMinutes && statusRes.data.contestStatus === 'running') {
+                const start = new Date(statusRes.data.contestStartTime);
+                const end = new Date(start.getTime() + statusRes.data.contestDurationMinutes * 60000);
+                setContestEndTime(end);
+            }
 
             if (statusRes.data.contestStatus === 'running' || statusRes.data.contestStatus === 'ended') {
                 const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/riddles`, {
@@ -51,6 +59,27 @@ const ContestPage = () => {
         }
     };
 
+    useEffect(() => {
+        if (!contestEndTime) return;
+
+        const interval = setInterval(() => {
+            const now = new Date();
+            const diff = contestEndTime - now;
+
+            if (diff <= 0) {
+                setTimeLeft('00:00:00');
+                clearInterval(interval);
+            } else {
+                const h = Math.floor((diff / (1000 * 60 * 60)) % 24).toString().padStart(2, '0');
+                const m = Math.floor((diff / 1000 / 60) % 60).toString().padStart(2, '0');
+                const s = Math.floor((diff / 1000) % 60).toString().padStart(2, '0');
+                setTimeLeft(`${h}:${m}:${s}`);
+            }
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [contestEndTime]);
+
     return (
         <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4">
             <Navbar activeTab="CONTEST" />
@@ -65,7 +94,9 @@ const ContestPage = () => {
                     </div>
                     <div className="p-0">
                         {loading ? (
-                            <div className="p-4 text-center text-[#888]">Loading...</div>
+                            <div className="p-12 flex justify-center items-center">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0000cc]"></div>
+                            </div>
                         ) : contestStatus === 'not_started' ? (
                             <div className="p-12 text-center text-[#333] font-bold text-lg">
                                 ⏳ The contest has not started yet! Please wait.
@@ -148,6 +179,12 @@ const ContestPage = () => {
                             Contest Information
                         </div>
                         <div className="p-3 text-[13px] text-[#333]">
+                            {timeLeft && (
+                                <div className="mb-3 border-b border-[#eee] pb-3">
+                                    <div className="font-bold text-[#888] mb-1 uppercase text-xs">Time Remaining</div>
+                                    <div className="text-2xl font-mono text-[#cc0000]">{timeLeft}</div>
+                                </div>
+                            )}
                             <p className="mb-2"><strong>Name:</strong> CodeQuest 2026 Finals</p>
                             <p className="mb-2"><strong>Duration:</strong> 3 hours</p>
                             <p className={`mb-2 font-bold ${contestStatus === 'running' ? 'text-[#00a900]' :

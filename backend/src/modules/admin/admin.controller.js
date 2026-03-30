@@ -180,3 +180,37 @@ export const deleteProblem = async (req, res) => {
         res.status(500).json({ message: 'Failed to delete problem.' });
     }
 };
+
+// -- DASHBOARD ANALYTICS --
+
+import Submission from '../../models/Submission.js';
+
+export const getDashboardAnalytics = async (req, res) => {
+    try {
+        const [
+            totalTeams,
+            verifiedTeams,
+            totalSubmissions,
+            activeProblems,
+            activeRiddles
+        ] = await Promise.all([
+            Team.countDocuments(),
+            Team.countDocuments({ isVerified: true }),
+            Submission.countDocuments(),
+            Problem.countDocuments(),
+            Riddle.countDocuments({ isActive: true })
+        ]);
+
+        res.status(200).json({
+            totalTeams,
+            verifiedTeams,
+            pendingTeams: totalTeams - verifiedTeams,
+            totalSubmissions,
+            activeProblems,
+            activeRiddles
+        });
+    } catch (error) {
+        console.error('Error fetching analytics:', error);
+        res.status(500).json({ message: 'Failed to fetch analytics.' });
+    }
+};

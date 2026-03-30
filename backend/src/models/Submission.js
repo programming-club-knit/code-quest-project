@@ -21,4 +21,8 @@ const submissionSchema = new mongoose.Schema({
     memory: { type: Number } // in KB
 }, { timestamps: true });
 
+// Optimizes querying a team's submissions in order
+submissionSchema.index({ teamId: 1, createdAt: 1 });
+submissionSchema.index({ problemId: 1 });
+
 export default mongoose.model('Submission', submissionSchema);

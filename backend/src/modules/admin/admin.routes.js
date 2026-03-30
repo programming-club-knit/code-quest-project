@@ -12,12 +12,16 @@ import {
     createProblem,
     getAllProblems,
     updateProblem,
-    deleteProblem
+    deleteProblem,
+    getDashboardAnalytics
 } from './admin.controller.js';
 
 const router = Router();
 
 router.use(verifyAdmin);
+
+// Dashboard Analytics
+router.get('/analytics', getDashboardAnalytics);
 
 // Retrieve all teams for admin dashboard
 router.get('/teams', getAllTeams);

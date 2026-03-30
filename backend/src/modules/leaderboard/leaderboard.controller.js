@@ -2,8 +2,17 @@ import Team from '../../models/Team.js';
 import Submission from '../../models/Submission.js';
 import Problem from '../../models/Problem.js';
 
+let cachedLeaderboard = null;
+let lastCacheTime = 0;
+const CACHE_TTL_MS = 10 * 1000; // 10 seconds
+
 export const getLeaderboard = async (req, res) => {
     try {
+        const now = Date.now();
+        if (cachedLeaderboard && (now - lastCacheTime < CACHE_TTL_MS)) {
+            return res.status(200).json(cachedLeaderboard);
+        }
+
         const teams = await Team.find({ isVerified: true, isDisqualified: false }).select('_id teamName');
         const activeProblems = await Problem.find({ isActive: true }).select('_id title points');
 
@@ -20,15 +29,15 @@ export const getLeaderboard = async (req, res) => {
             let totalScore = 0;
             let latestSolveTime = 0;
             const problemsSolvedByTeam = {};
-            const failedCounts = {}; 
+            const failedCounts = {};
 
-            const PENALTY_PER_FAIL = 15; 
+            const PENALTY_PER_FAIL = 15;
 
             for (const sub of allSubmissions) {
                 const pId = sub.problemId.toString();
 
                 if (problemsSolvedByTeam[pId]) {
-                    continue; 
+                    continue;
                 }
 
                 if (sub.verdict === 'Accepted') {
@@ -37,13 +46,13 @@ export const getLeaderboard = async (req, res) => {
                     if (problemPoints[pId]) {
                         const baseScore = problemPoints[pId];
                         const penalty = (failedCounts[pId] || 0) * PENALTY_PER_FAIL;
-                        
+
                         let earnedScore = baseScore - penalty;
                         if (earnedScore < 0) earnedScore = 0;
 
                         totalScore += earnedScore;
 
-                        const solveTimeNum = new Date(sub.createdAt).getTime(); 
+                        const solveTimeNum = new Date(sub.createdAt).getTime();
                         if (solveTimeNum > latestSolveTime) {
                             latestSolveTime = solveTimeNum;
                         }
@@ -84,10 +93,15 @@ export const getLeaderboard = async (req, res) => {
             rank++;
         });
 
-        res.status(200).json({
+        const responsePayload = {
             leaderboard,
-            problems: activeProblems.map(p => ({ id: p._id, title: p.title }))  
-        });
+            problems: activeProblems.map(p => ({ id: p._id, title: p.title }))
+        };
+
+        cachedLeaderboard = responsePayload;
+        lastCacheTime = now;
+
+        res.status(200).json(responsePayload);
     } catch (error) {
         console.error('Error fetching leaderboard:', error);
         res.status(500).json({ error: 'Failed to fetch leaderboard' });

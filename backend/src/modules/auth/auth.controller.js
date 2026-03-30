@@ -71,8 +71,8 @@ export const loginTeam = async (req, res) => {
         // Set token in HTTP-only cookie
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-            sameSite: 'strict',
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
             maxAge: 24 * 60 * 60 * 1000 // 24 hours
         });
 
@@ -94,7 +94,7 @@ export const logoutTeam = (req, res) => {
     res.clearCookie('token', {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict'
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict'
     });
     res.status(200).json({ message: 'Logged out successfully' });
 };
@@ -115,7 +115,7 @@ export const loginAdmin = (req, res) => {
             res.cookie('adminToken', token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
                 maxAge: 24 * 60 * 60 * 1000 // 24 hours
             });
 
@@ -133,7 +133,7 @@ export const logoutAdmin = (req, res) => {
     res.clearCookie('adminToken', {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict'
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict'
     });
     res.status(200).json({ message: 'Admin logged out' });
 };

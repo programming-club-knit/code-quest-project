@@ -28,7 +28,11 @@ const LeaderboardPage = () => {
     }, []);
 
     if (loading) {
-        return <div className="font-sans min-h-screen bg-[#f3f3f3] flex justify-center py-10">Loading...</div>;
+        return (
+            <div className="font-sans min-h-screen bg-[#f3f3f3] flex justify-center py-10">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0000cc]"></div>
+            </div>
+        );
     }
 
     return (

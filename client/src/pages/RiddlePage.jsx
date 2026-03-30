@@ -20,6 +20,22 @@ const RiddlePage = () => {
     // QR Scanner states
     const [showScanner, setShowScanner] = useState(false);
 
+    const handleToggleScanner = async () => {
+        if (showScanner) {
+            setShowScanner(false);
+            return;
+        }
+
+        try {
+            // Explicitly request camera permissions before mounting the scanner
+            await navigator.mediaDevices.getUserMedia({ video: true });
+            setShowScanner(true);
+        } catch (error) {
+            console.error("Camera permission denied or error:", error);
+            toast.error("Camera access is required to scan QR codes.");
+        }
+    };
+
     useEffect(() => {
         const fetchRiddle = async () => {
             try {
@@ -153,7 +169,7 @@ const RiddlePage = () => {
                                 <h3 className="font-bold text-[14px] text-[#222]">Submit Riddle Answer:</h3>
                                 <button
                                     type="button"
-                                    onClick={() => setShowScanner(!showScanner)}
+                                    onClick={handleToggleScanner}
                                     className="text-[#0000cc] hover:underline text-[13px] font-bold"
                                 >
                                     {showScanner ? "Close Scanner" : "Scan QR Code"}

@@ -99,14 +99,14 @@ const AdminRiddles = () => {
     };
 
     return (
-        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4">
+        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4 px-2 sm:px-4">
             <AdminNavbar activeTab="RIDDLES" />
 
-            <div className="w-full max-w-[1200px] flex gap-4 items-start">
+            <div className="w-full max-w-[1200px] flex flex-col md:flex-row gap-4 items-start mt-4">
 
                 {/* Left col: List */}
-                <div className="flex-2 bg-white border border-[#b9b9b9] text-[13px] shadow-sm rounded-sm">
-                    <div className="border-b border-[#b9b9b9] bg-[#e1e1e1] text-[#333] font-bold py-[6px] px-3 rounded-t-[1px]">
+                <div className="flex-1 md:flex-2 w-full bg-white border border-[#b9b9b9] text-[13px] shadow-sm rounded-sm overflow-x-auto">
+                    <div className="border-b border-[#b9b9b9] bg-[#e1e1e1] text-[#333] font-bold py-[6px] px-3 rounded-t-[1px] min-w-[500px]">
                         Riddles List ({riddles.length})
                     </div>
                     <div className="p-4">
@@ -115,7 +115,7 @@ const AdminRiddles = () => {
                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0000cc]"></div>
                             </div>
                         ) : (
-                            <table className="w-full border-collapse">
+                            <table className="w-full border-collapse min-w-[500px]">
                                 <thead>
                                     <tr className="border-b-2 border-[#b9b9b9] text-left text-[#222]">
                                         <th className="py-2 px-2">Title</th>

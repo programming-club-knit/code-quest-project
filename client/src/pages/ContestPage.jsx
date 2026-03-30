@@ -81,14 +81,14 @@ const ContestPage = () => {
     }, [contestEndTime]);
 
     return (
-        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4">
+        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4 px-2 sm:px-4">
             <Navbar activeTab="CONTEST" />
 
             {/* Main Content Area */}
-            <div className="w-full max-w-[1000px] flex gap-4 items-start">
+            <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-4 items-start mt-4">
 
                 {/* Riddles List */}
-                <div className="flex-1 bg-white border border-[#b9b9b9] text-[13px] shadow-sm rounded-sm">
+                <div className="flex-1 w-full bg-white border border-[#b9b9b9] text-[13px] shadow-sm rounded-sm">
                     <div className="border-b border-[#b9b9b9] bg-[#e1e1e1] text-[#333] font-bold py-[6px] px-3 rounded-t-[1px]">
                         Problems
                     </div>
@@ -108,52 +108,54 @@ const ContestPage = () => {
                         ) : riddles.length === 0 ? (
                             <div className="p-4 text-center text-[#888]">No active riddles found.</div>
                         ) : (
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="border-b border-[#b9b9b9] bg-[#f9f9f9] text-[#222]">
-                                        <th className="py-2 px-3 font-normal border-r border-[#eee] w-[50px] text-center">#</th>
-                                        <th className="py-2 px-3 font-normal border-r border-[#eee]">Name</th>
-                                        <th className="py-2 px-3 font-normal border-r border-[#eee] w-[80px] text-center">Points</th>
-                                        <th className="py-2 px-3 font-normal w-[120px] text-center">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {riddles.map((riddle, index) => (
-                                        <tr key={riddle._id} className="hover:bg-[#f5f5f5] border-b border-[#eee]">
-                                            <td className="py-2 px-3 border-r border-[#eee] text-center font-bold text-[#333]">
-                                                {String.fromCharCode(65 + index)}
-                                            </td>
-                                            <td className="py-2 px-3 border-r border-[#eee]">
-                                                {riddle.status === 'permanently_locked' ? (
-                                                    <span className="text-[#888] line-through font-bold text-left cursor-not-allowed" title="Failed to solve in time">
-                                                        {riddle.title}
-                                                    </span>
-                                                ) : (
-                                                    <button
-                                                        onClick={() => navigate(`/riddle/${riddle._id}`)}
-                                                        className="text-[#0000cc] hover:underline font-bold text-left"
-                                                    >
-                                                        {riddle.title}
-                                                        {riddle.isPenaltyTarget && <span className="ml-2 text-[10px] bg-[#cc0000] text-white px-[4px] py-[2px] rounded-sm font-normal">PENALTY</span>}
-                                                    </button>
-                                                )}
-                                            </td>
-                                            <td className="py-2 px-3 border-r border-[#eee] text-center text-[#444]">
-                                                {riddle.points}
-                                            </td>
-                                            <td className="py-2 px-3 text-center text-[12px]">
-                                                {riddle.status === 'solved' ? (
-                                                    <span className="text-[#00a900] font-bold">Solved</span>
-                                                ) : riddle.status === 'permanently_locked' ? (
-                                                    <span className="text-[#cc0000] font-bold">Locked</span>
-                                                ) : (
-                                                    <span className="text-[#888]">-</span>
-                                                )}
-                                            </td>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse min-w-[400px]">
+                                    <thead>
+                                        <tr className="border-b border-[#b9b9b9] bg-[#f9f9f9] text-[#222]">
+                                            <th className="py-2 px-3 font-normal border-r border-[#eee] w-[40px] sm:w-[50px] text-center">#</th>
+                                            <th className="py-2 px-3 font-normal border-r border-[#eee]">Name</th>
+                                            <th className="py-2 px-3 font-normal border-r border-[#eee] w-[60px] sm:w-[80px] text-center">Points</th>
+                                            <th className="py-2 px-3 font-normal w-[80px] sm:w-[120px] text-center">Status</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {riddles.map((riddle, index) => (
+                                            <tr key={riddle._id} className="hover:bg-[#f5f5f5] border-b border-[#eee]">
+                                                <td className="py-2 px-3 border-r border-[#eee] text-center font-bold text-[#333]">
+                                                    {String.fromCharCode(65 + index)}
+                                                </td>
+                                                <td className="py-2 px-3 border-r border-[#eee]">
+                                                    {riddle.status === 'permanently_locked' ? (
+                                                        <span className="text-[#888] line-through font-bold text-left cursor-not-allowed" title="Failed to solve in time">
+                                                            {riddle.title}
+                                                        </span>
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => navigate(`/riddle/${riddle._id}`)}
+                                                            className="text-[#0000cc] hover:underline font-bold text-left flex flex-wrap items-center gap-1"
+                                                        >
+                                                            <span>{riddle.title}</span>
+                                                            {riddle.isPenaltyTarget && <span className="text-[10px] bg-[#cc0000] text-white px-[4px] py-[2px] rounded-sm font-normal whitespace-nowrap">PENALTY</span>}
+                                                        </button>
+                                                    )}
+                                                </td>
+                                                <td className="py-2 px-3 border-r border-[#eee] text-center text-[#444]">
+                                                    {riddle.points}
+                                                </td>
+                                                <td className="py-2 px-3 text-center text-[12px]">
+                                                    {riddle.status === 'solved' ? (
+                                                        <span className="text-[#00a900] font-bold">Solved</span>
+                                                    ) : riddle.status === 'permanently_locked' ? (
+                                                        <span className="text-[#cc0000] font-bold">Locked</span>
+                                                    ) : (
+                                                        <span className="text-[#888]">-</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         )}
 
                         {canUnlockPenalty && (
@@ -173,7 +175,7 @@ const ContestPage = () => {
                 </div>
 
                 {/* Sidebar */}
-                <div className="w-[280px] flex flex-col gap-4">
+                <div className="w-full md:w-[280px] flex flex-col gap-4">
                     <div className="bg-white border border-[#b9b9b9] shadow-sm rounded-sm">
                         <div className="border-b border-[#b9b9b9] bg-[#e1e1e1] text-[#222] font-bold py-[6px] px-3 text-[13px]">
                             Contest Information

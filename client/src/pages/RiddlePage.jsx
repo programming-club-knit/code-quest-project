@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Navbar from '../components/Navbar';
+import { Html5QrcodeScanner } from 'html5-qrcode';
 
 const RiddlePage = () => {
     const navigate = useNavigate();
@@ -15,6 +16,9 @@ const RiddlePage = () => {
     const [isCorrect, setIsCorrect] = useState(false);
     const [showError, setShowError] = useState(false);
     const [openingProblem, setOpeningProblem] = useState(false);
+
+    // QR Scanner states
+    const [showScanner, setShowScanner] = useState(false);
 
     useEffect(() => {
         const fetchRiddle = async () => {
@@ -36,6 +40,36 @@ const RiddlePage = () => {
         };
         fetchRiddle();
     }, [id, navigate]);
+
+    useEffect(() => {
+        let html5QrcodeScanner;
+        if (showScanner && !isCorrect && riddle && !riddle.isSolved) {
+            html5QrcodeScanner = new Html5QrcodeScanner(
+                "qr-reader",
+                { fps: 10, qrbox: { width: 250, height: 250 }, rememberLastUsedCamera: true },
+                /* verbose= */ false
+            );
+            html5QrcodeScanner.render(
+                (decodedText) => {
+                    setAnswer(decodedText);
+                    setShowScanner(false);
+                    setShowError(false);
+                    toast.success("QR Code scanned successfully!");
+                },
+                (error) => {
+                    // Ignore background scan errors
+                }
+            );
+        }
+
+        return () => {
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.clear().catch(error => {
+                    console.error("Failed to clear scanner", error);
+                });
+            }
+        };
+    }, [showScanner, isCorrect, riddle]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -92,20 +126,20 @@ const RiddlePage = () => {
     if (!riddle) return null;
 
     return (
-        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4">
+        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4 px-2 sm:px-4">
             <Navbar activeTab="RIDDLE" />
 
             {/* Navigation / Actions */}
             <div className="w-full max-w-[1000px] mb-2 text-[13px] flex justify-start">
-                <button onClick={() => navigate('/contest')} className="text-[#0000cc] hover:underline font-bold">
+                <button onClick={() => navigate('/contest')} className="text-[#0000cc] hover:underline font-bold px-2 sm:px-0">
                     ← Back to All Riddles
                 </button>
             </div>
 
             {/* Main Content */}
-            <div className="w-full max-w-[1000px] bg-white border border-[#b9b9b9] p-8 shadow-sm">
-                <div className="text-center mb-8 border-b border-[#eee] pb-6">
-                    <h2 className="text-[22px] font-normal mb-1">{riddle.title}</h2>
+            <div className="w-full max-w-[1000px] bg-white border border-[#b9b9b9] p-4 sm:p-8 shadow-sm">
+                <div className="text-center mb-6 sm:mb-8 border-b border-[#eee] pb-4 sm:pb-6">
+                    <h2 className="text-[20px] sm:text-[22px] font-normal mb-1">{riddle.title}</h2>
                 </div>
 
                 <div className="text-[14px] leading-relaxed text-[#333] max-w-[800px] mx-auto">
@@ -114,9 +148,25 @@ const RiddlePage = () => {
                     </p>
 
                     {!riddle.isSolved && (
-                        <div className="mt-8 p-6 bg-[#f9f9f9] border border-[#e1e1e1] rounded-sm">
-                            <h3 className="font-bold text-[14px] mb-3 text-[#222]">Submit Riddle Answer:</h3>
-                            <form onSubmit={handleSubmit} className="flex items-center gap-3">
+                        <div className="mt-8 p-4 sm:p-6 bg-[#f9f9f9] border border-[#e1e1e1] rounded-sm">
+                            <div className="flex justify-between items-center mb-3">
+                                <h3 className="font-bold text-[14px] text-[#222]">Submit Riddle Answer:</h3>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowScanner(!showScanner)}
+                                    className="text-[#0000cc] hover:underline text-[13px] font-bold"
+                                >
+                                    {showScanner ? "Close Scanner" : "Scan QR Code"}
+                                </button>
+                            </div>
+
+                            {showScanner && (
+                                <div className="mb-4">
+                                    <div id="qr-reader" className="w-full max-w-[400px] mx-auto border border-[#b9b9b9] bg-white"></div>
+                                </div>
+                            )}
+
+                            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                                 <input
                                     type="text"
                                     value={answer}
@@ -126,12 +176,12 @@ const RiddlePage = () => {
                                     }}
                                     disabled={isCorrect}
                                     placeholder="Enter your answer here..."
-                                    className="flex-1 border border-[#b9b9b9] px-3 py-2 text-[13px] outline-none focus:border-[#888]"
+                                    className="flex-1 border border-[#b9b9b9] px-3 py-2 text-[13px] outline-none focus:border-[#888] w-full"
                                 />
                                 <button
                                     type="submit"
                                     disabled={isCorrect || !answer.trim()}
-                                    className="bg-[#e1e1e1] hover:bg-[#d1d1d1] border border-[#b9b9b9] px-6 py-2 text-[13px] font-bold cursor-pointer disabled:opacity-50"
+                                    className="bg-[#e1e1e1] hover:bg-[#d1d1d1] border border-[#b9b9b9] px-6 py-2 text-[13px] font-bold cursor-pointer disabled:opacity-50 w-full sm:w-auto mt-2 sm:mt-0"
                                 >
                                     Submit
                                 </button>

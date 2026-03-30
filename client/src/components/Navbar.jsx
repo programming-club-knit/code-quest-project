@@ -30,21 +30,21 @@ const Navbar = ({ activeTab, maxWidth = "1000px" }) => {
 
     return (
         <div className="w-full flex flex-col items-center mb-4">
-            <div className="w-full flex items-end justify-between pb-2 mb-2" style={{ maxWidth }}>
-                <div className="flex items-center gap-4">
-                    <img src="/logo.png" alt="CodeQuest Logo" className="h-16 object-contain" />
-                    <div className="h-12 w-px bg-[#b9b9b9]"></div>
-                    <img src="/knitlogo.png" alt="KNIT Logo" className="h-14 object-contain" />
+            <div className="w-full flex flex-col md:flex-row items-center md:items-end justify-between pb-2 mb-2 gap-4 md:gap-0" style={{ maxWidth }}>
+                <div className="flex items-center justify-center md:justify-start gap-4 w-full md:w-auto">
+                    <img src="/logo.png" alt="CodeQuest Logo" className="h-12 md:h-16 object-contain" />
+                    <div className="h-10 md:h-12 w-px bg-[#b9b9b9]"></div>
+                    <img src="/knitlogo.png" alt="KNIT Logo" className="h-10 md:h-14 object-contain" />
                 </div>
-                <div className="text-[13px]">
+                <div className="text-[13px] text-center md:text-right w-full md:w-auto">
                     <span className="text-[#0000cc] font-bold">{teamName}</span>
                     <span className="mx-2 text-[#b9b9b9]">|</span>
                     <button onClick={handleLogout} className="text-[#0000cc] hover:underline hover:text-[#0000ff] cursor-pointer">Logout</button>
                 </div>
             </div>
 
-            <div className="w-full" style={{ maxWidth }}>
-                <div className="border border-[#b9b9b9] bg-white rounded-sm mb-1">
+            <div className="w-full overflow-x-auto" style={{ maxWidth }}>
+                <div className="border border-[#b9b9b9] bg-white rounded-sm mb-1 min-w-max">
                     <div className="flex text-[13px] font-bold">
                         {tabs.map((tab, index) => {
                             const isActive = tab.name === activeTab;

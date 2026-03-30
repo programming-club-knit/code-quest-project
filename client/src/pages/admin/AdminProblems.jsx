@@ -196,63 +196,66 @@ const AdminProblems = () => {
     };
 
     return (
-        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4">
+        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4 px-2 sm:px-4">
             <AdminNavbar activeTab="PROBLEMS" />
 
             <div className="w-full max-w-[1200px]">
-                <div className="bg-white border border-[#b9b9b9] text-[13px] shadow-sm rounded-sm">
-                    <div className="border-b border-[#b9b9b9] bg-[#e1e1e1] text-[#333] font-bold py-[6px] px-3 rounded-t-[1px] flex justify-between items-center">
-                        <span>Manage Coding Problems</span>
-                        <button onClick={openCreateModal} className="text-[#0000cc] hover:underline">+ Create New Problem</button>
+                <div className="bg-white border text-[13px] shadow-sm rounded-sm overflow-hidden">
+                    <div className="border-b bg-[#e1e1e1] text-[#333] font-bold py-[8px] px-3 md:px-[14px] flex justify-between items-center">
+                        <span className="text-[14px]">Manage Coding Problems</span>
+                        <button onClick={openCreateModal} className="text-[#0000cc] hover:underline whitespace-nowrap ml-2">+ Create</button>
                     </div>
 
-                    <div className="p-4">
+                    <div className="p-0 sm:p-4 overflow-x-auto">
                         {loading ? (
-                            <p className="p-4 text-center text-[#666]">Loading problems...</p>
+                            <div className="flex justify-center items-center py-8">
+                                <div className="w-8 h-8 rounded-full border-4 border-[#0000cc] border-t-transparent animate-spin"></div>
+                            </div>
                         ) : problems.length === 0 ? (
                             <p className="p-4 text-center text-[#888] italic">No problems have been created yet.</p>
                         ) : (
-                            <table className="w-full border-collapse">
-                                <thead>
-                                    <tr className="border-b-2 border-[#b9b9b9] text-left text-[#222]">
-                                        <th className="py-2 px-2">Title</th>
-                                        <th className="py-2 px-2">Linked Riddle</th>
-                                        <th className="py-2 px-2">Difficulty</th>
-                                        <th className="py-2 px-2">Points</th>
-                                        <th className="py-2 px-2">Test Cases</th>
-                                        <th className="py-2 px-2">Time/Memory</th>
-                                        <th className="py-2 px-2">Status</th>
-                                        <th className="py-2 px-2 text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {problems.map((p, index) => (
-                                        <tr key={p._id} className={`border-b border-[#eee] ${index % 2 === 0 ? 'bg-white' : 'bg-[#fafafa]'}`}>
-                                            <td className="py-2 px-2 font-bold text-[#0000cc]">{p.title}</td>
-                                            <td className="py-2 px-2 text-[#666]">{p.riddleId?.title || 'N/A'}</td>
-                                            <td className="py-2 px-2">{p.difficulty}</td>
-                                            <td className="py-2 px-2">{p.points}</td>
-                                            <td className="py-2 px-2 text-center">{p.testCases?.length || 0}</td>
-                                            <td className="py-2 px-2 text-[11px] font-mono text-[#666]">{p.timeLimit}s / {p.memoryLimit}KB</td>
-                                            <td className="py-2 px-2">
-                                                {p.isActive
-                                                    ? <span className="text-[#00a900] font-bold">Active</span>
-                                                    : <span className="text-[#888] font-bold line-through">Hidden</span>}
-                                            </td>
-                                            <td className="py-2 px-2 text-right flex gap-3 justify-end">
-                                                <button onClick={() => openEditModal(p)} className="text-[#0000cc] hover:underline">Edit</button>
-                                                <button onClick={() => handleDelete(p._id)} className="text-[#cc0000] hover:underline">Delete</button>
-                                            </td>
+                            <div className="min-w-[800px]">
+                                <table className="w-full border-collapse">
+                                    <thead>
+                                        <tr className="border-b-2 border-[#b9b9b9] text-left text-[#222]">
+                                            <th className="py-2 px-3 sm:px-4">Title</th>
+                                            <th className="py-2 px-3 sm:px-4 hidden sm:table-cell">Linked Riddle</th>
+                                            <th className="py-2 px-3 sm:px-4">Difficulty</th>
+                                            <th className="py-2 px-3 sm:px-4 hidden md:table-cell">Points</th>
+                                            <th className="py-2 px-3 sm:px-4 hidden sm:table-cell">Test Cases</th>
+                                            <th className="py-2 px-3 sm:px-4 hidden lg:table-cell">Time/Memory</th>
+                                            <th className="py-2 px-3 sm:px-4">Status</th>
+                                            <th className="py-2 px-3 sm:px-4 text-right">Actions</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="text-[#333]">
+                                        {problems.map((p, index) => (
+                                            <tr key={p._id} className={`border-b border-[#eee] ${index % 2 === 0 ? 'bg-white' : 'bg-[#fafafa]'}`}>
+                                                <td className="py-2 px-3 sm:px-4 font-bold text-[#0000cc] truncate max-w-[150px] sm:max-w-[200px]">{p.title}</td>
+                                                <td className="py-2 px-3 sm:px-4 text-[#666] hidden sm:table-cell truncate max-w-[150px]">{p.riddleId?.title || 'N/A'}</td>
+                                                <td className="py-2 px-3 sm:px-4">{p.difficulty}</td>
+                                                <td className="py-2 px-3 sm:px-4 hidden md:table-cell">{p.points}</td>
+                                                <td className="py-2 px-3 sm:px-4 text-center hidden sm:table-cell">{p.testCases?.length || 0}</td>
+                                                <td className="py-2 px-3 sm:px-4 text-[11px] font-mono text-[#666] hidden lg:table-cell">{p.timeLimit}s / {p.memoryLimit}KB</td>
+                                                <td className="py-2 px-3 sm:px-4">
+                                                    {p.isActive
+                                                        ? <span className="text-[#00a900] font-bold">Active</span>
+                                                        : <span className="text-[#888] font-bold line-through">Hidden</span>}
+                                                </td>
+                                                <td className="py-2 px-3 sm:px-4 text-right flex gap-3 justify-end items-center h-[40px]">
+                                                    <button onClick={() => openEditModal(p)} className="text-[#0000cc] hover:underline">Edit</button>
+                                                    <button onClick={() => handleDelete(p._id)} className="text-[#cc0000] hover:underline">Delete</button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         )}
                     </div>
                 </div>
             </div>
 
-            {/* Modal for Creating/Editing Problems */}
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-sm shadow-lg w-full max-w-[700px] max-h-[90vh] overflow-y-auto border border-[#b9b9b9]">
@@ -494,6 +497,6 @@ const AdminProblems = () => {
             )}
         </div>
     );
-};
+}
 
 export default AdminProblems;

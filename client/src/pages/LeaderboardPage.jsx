@@ -36,11 +36,11 @@ const LeaderboardPage = () => {
     }
 
     return (
-        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4">
+        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4 px-2 sm:px-4">
             <Navbar activeTab="LEADERBOARD" />
 
             {/* Main Content Area */}
-            <div className="w-full max-w-[1000px]">
+            <div className="w-full max-w-[1000px] mt-4">
                 <div className="bg-white border border-[#b9b9b9] text-[13px] shadow-sm rounded-sm">
                     <div className="border-b border-[#b9b9b9] bg-[#e1e1e1] text-[#333] font-bold py-[6px] px-3 rounded-t-[1px]">
                         Standings

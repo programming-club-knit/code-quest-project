@@ -80,14 +80,14 @@ const AdminDashboard = () => {
     };
 
     return (
-        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4">
+        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4 px-2 sm:px-4">
             <AdminNavbar activeTab="DASHBOARD" />
 
             {/* Main Content Area */}
-            <div className="w-full max-w-[1200px] flex gap-4">
+            <div className="w-full max-w-[1200px] flex flex-col md:flex-row gap-4 mt-4">
 
                 {/* Stats Grid */}
-                <div className="flex-1 grid grid-cols-3 gap-4">
+                <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-4">
                     <div className="bg-white border border-[#b9b9b9] text-[13px] shadow-sm rounded-sm p-4 text-center">
                         <div className="text-[#888] font-bold mb-2 uppercase">Total Teams</div>
                         <div className="text-3xl text-[#cc0000]">{stats.totalTeams}</div>
@@ -115,7 +115,7 @@ const AdminDashboard = () => {
                 </div>
 
                 {/* Sidebar area */}
-                <div className="w-[300px] flex flex-col gap-4">
+                <div className="w-full md:w-[300px] flex flex-col gap-4">
                     <div className="bg-white border border-[#b9b9b9] text-[13px] shadow-sm rounded-sm">
                         <div className="border-b border-[#b9b9b9] bg-[#e1e1e1] text-[#333] font-bold py-[6px] px-3 rounded-t-[1px]">
                             Contest Controls

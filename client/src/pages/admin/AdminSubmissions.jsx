@@ -45,17 +45,21 @@ const AdminSubmissions = () => {
         return tMatch && pMatch;
     });
 
-    if (loading) return <div className="p-10 text-center">Loading Submissions...</div>;
+    if (loading) return (
+        <div className="flex bg-[#f3f3f3] items-center justify-center min-h-screen text-[14px]">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0000cc]"></div>
+        </div>
+    );
 
     return (
-        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4">
+        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4 px-2 sm:px-4">
             <AdminNavbar activeTab="SUBMISSIONS" />
 
-            <div className="w-full max-w-[1200px]">
+            <div className="w-full max-w-[1200px] mt-4">
                 <div className="bg-white border border-[#b9b9b9] text-[13px] shadow-sm rounded-sm">
-                    <div className="border-b border-[#b9b9b9] bg-[#e1e1e1] text-[#333] font-bold py-[6px] px-3 rounded-t-[1px] flex justify-between items-center">
+                    <div className="border-b border-[#b9b9b9] bg-[#e1e1e1] text-[#333] font-bold py-[6px] px-3 rounded-t-[1px] flex flex-col sm:flex-row justify-between items-center gap-2">
                         <span>All Global Submissions <span className="text-[#cc0000] ml-2 text-[11px] font-normal">● LIVE</span></span>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-wrap justify-center">
                             <input
                                 type="text"
                                 placeholder="Filter by team..."

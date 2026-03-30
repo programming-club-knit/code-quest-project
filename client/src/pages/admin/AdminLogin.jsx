@@ -29,71 +29,67 @@ const AdminLogin = () => {
     };
 
     return (
-        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4">
+        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4 px-2 sm:px-4">
             <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
 
             {/* Top Navbar / Header */}
-            <div className="w-full max-w-[1000px] flex items-end justify-between border-b border-[#b9b9b9] pb-2 mb-8">
+            <div className="w-full max-w-[1000px] flex items-center sm:items-end justify-between border-b border-[#b9b9b9] pb-2 mb-8">
                 <div className="flex items-center gap-4">
-                    <img src="/logo.png" alt="CodeQuest Logo" className="h-16 object-contain" />
-                    <div className="h-12 w-px bg-[#b9b9b9]"></div>
-                    <img src="/knitlogo.png" alt="KNIT Logo" className="h-14 object-contain" />
+                    <img src="/logo.png" alt="CodeQuest Logo" className="h-12 w-auto sm:h-16 object-contain" />
+                    <div className="h-10 sm:h-12 w-px bg-[#b9b9b9]"></div>
+                    <img src="/knitlogo.png" alt="KNIT Logo" className="h-10 w-auto sm:h-14 object-contain" />
                 </div>
             </div>
 
             {/* Main Login Box */}
-            <div className="w-[450px] bg-white border border-[#b9b9b9] text-[13px] shadow-sm tracking-wide rounded-sm">
+            <div className="w-full max-w-[450px] bg-white border border-[#b9b9b9] text-[13px] shadow-sm tracking-wide rounded-sm">
                 <div className="border-b border-[#b9b9b9] bg-[#cc0000] text-white font-bold py-[6px] px-3 mb-2 rounded-t-[1px]">
                     Admin Login
                 </div>
 
-                <div className="p-4 px-6 text-[#222]">
+                <div className="p-4 px-3 sm:px-6 text-[#222]">
                     <form onSubmit={handleLogin}>
-                        <table className="w-full">
-                            <tbody>
-                                <tr>
-                                    <td className="py-[6px] text-right pr-4 font-bold w-[40%]">
-                                        <label htmlFor="adminId">Admin ID</label>
-                                    </td>
-                                    <td className="py-[6px]">
-                                        <input
-                                            id="adminId"
-                                            type="text"
-                                            value={adminId}
-                                            onChange={(e) => setAdminId(e.target.value)}
-                                            required
-                                            className="w-full border border-[#ccc] focus:border-[#888] focus:outline-none focus:shadow-[0_0_3px_#aaa] px-[3px] py-[2px] transition-shadow text-[13px]"
-                                        />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className="py-[6px] text-right pr-4 font-bold">
-                                        <label htmlFor="password">Password</label>
-                                    </td>
-                                    <td className="py-[6px]">
-                                        <input
-                                            id="password"
-                                            type="password"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            required
-                                            className="w-full border border-[#ccc] focus:border-[#888] focus:outline-none focus:shadow-[0_0_3px_#aaa] px-[3px] py-[2px] transition-shadow text-[13px]"
-                                        />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td className="py-3">
-                                        <button
-                                            type="submit"
-                                            className="bg-[#e4e4e4] border border-[#b9b9b9] hover:bg-[#d0d0d0] px-[12px] py-[2px] text-[#222] font-semibold text-[13px] rounded-sm transition-colors active:bg-[#c0c0c0]"
-                                        >
-                                            Login
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div className="flex flex-col gap-3 sm:gap-2 w-full">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center">
+                                <div className="sm:w-[40%] sm:text-right sm:pr-4 font-bold mb-1 sm:mb-0"><label htmlFor="adminId">Admin ID</label></div>
+                                <div className="w-full sm:w-[60%]">
+                                    <input
+                                        id="adminId"
+                                        type="text"
+                                        value={adminId}
+                                        onChange={(e) => setAdminId(e.target.value)}
+                                        required
+                                        className="w-full border border-[#ccc] focus:border-[#888] focus:outline-none focus:shadow-[0_0_3px_#aaa] px-[5px] py-[4px] sm:py-[2px] transition-shadow text-[13px]"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center">
+                                <div className="sm:w-[40%] sm:text-right sm:pr-4 font-bold mb-1 sm:mb-0"><label htmlFor="password">Password</label></div>
+                                <div className="w-full sm:w-[60%]">
+                                    <input
+                                        id="password"
+                                        type="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                        className="w-full border border-[#ccc] focus:border-[#888] focus:outline-none focus:shadow-[0_0_3px_#aaa] px-[5px] py-[4px] sm:py-[2px] transition-shadow text-[13px]"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row mt-4">
+                                <div className="hidden sm:block sm:w-[40%]"></div>
+                                <div className="w-full sm:w-[60%]">
+                                    <button
+                                        type="submit"
+                                        className="bg-[#e4e4e4] border border-[#b9b9b9] hover:bg-[#d0d0d0] px-[16px] py-[4px] sm:py-[2px] text-[#222] font-semibold text-[13px] rounded-sm transition-colors active:bg-[#c0c0c0] w-full sm:w-auto"
+                                    >
+                                        Login
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>

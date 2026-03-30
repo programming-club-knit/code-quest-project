@@ -79,21 +79,21 @@ const AdminTeams = () => {
     };
 
     return (
-        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4">
+        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4 px-2 sm:px-4">
             <AdminNavbar activeTab="TEAMS" />
 
-            <div className="w-full max-w-[1200px]">
+            <div className="w-full max-w-[1200px] mt-4">
                 <div className="bg-white border border-[#b9b9b9] text-[13px] shadow-sm rounded-sm">
                     <div className="border-b border-[#b9b9b9] bg-[#e1e1e1] text-[#333] font-bold py-[6px] px-3 rounded-t-[1px] flex justify-between items-center">
                         <span>Manage Teams</span>
                         <span className="text-[11px] font-normal text-[#666]">Total: {teams.length}</span>
                     </div>
 
-                    <div className="p-4">
+                    <div className="p-4 overflow-x-auto">
                         {loading ? (
                             <p className="p-4 text-center text-[#666]">Loading teams...</p>
                         ) : (
-                            <table className="w-full border-collapse">
+                            <table className="w-full border-collapse min-w-[600px]">
                                 <thead>
                                     <tr className="border-b-2 border-[#b9b9b9] text-left text-[#222]">
                                         <th className="py-2 px-2">Team Name</th>
@@ -134,7 +134,7 @@ const AdminTeams = () => {
                                                 {isExpanded && (
                                                     <tr className="bg-[#f9f9f9] border-b border-[#ccc]">
                                                         <td colSpan="5" className="p-4 text-[12px] text-[#444]">
-                                                            <div className="grid grid-cols-2 gap-4">
+                                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                                 <div>
                                                                     <p><strong>Mobile No:</strong> {team.mobileNo}</p>
                                                                     <p><strong>Branch:</strong> {team.branch}</p>

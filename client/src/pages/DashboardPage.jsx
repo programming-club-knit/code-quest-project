@@ -28,21 +28,21 @@ const DashboardPage = () => {
     };
 
     return (
-        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4">
+        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4 px-2 sm:px-4">
             <Navbar activeTab="HOME" />
 
             {/* Main Content Area */}
-            <div className="w-full max-w-[1000px] flex gap-4">
+            <div className="w-full max-w-[1000px] flex flex-col lg:flex-row gap-4">
 
                 {/* Left Column (Main) */}
-                <div className="flex-1">
+                <div className="flex-1 w-full overflow-hidden">
                     {/* Contests Table */}
                     <div className="bg-white border border-[#b9b9b9] text-[13px] shadow-sm rounded-sm">
                         <div className="border-b border-[#b9b9b9] bg-[#e1e1e1] text-[#333] font-bold py-[6px] px-3 rounded-t-[1px]">
                             Current or upcoming contests
                         </div>
-                        <div className="p-0">
-                            <table className="w-full text-center border-collapse">
+                        <div className="p-0 overflow-x-auto">
+                            <table className="w-full text-center border-collapse min-w-[500px]">
                                 <thead>
                                     <tr className="border-b border-[#b9b9b9] bg-[#f9f9f9] text-[#222]">
                                         <th className="py-2 px-2 font-normal border-r border-[#eee]">Name</th>
@@ -55,19 +55,19 @@ const DashboardPage = () => {
                                     <tr className="hover:bg-[#f5f5f5]">
                                         <td className="py-3 px-2 border-r border-[#eee] text-left">
                                             <button onClick={() => navigate('/contest')} className="w-full flex justify-between items-center text-[#0000cc] hover:underline font-semibold pl-2 cursor-pointer">
-                                                {currentContest.name}
-                                                <span className="text-[#00a900] text-[10px] ml-2">Enter »</span>
+                                                <span className="truncate max-w-[150px] sm:max-w-[200px]">{currentContest.name}</span>
+                                                <span className="text-[#00a900] text-[10px] ml-2 whitespace-nowrap">Enter »</span>
                                             </button>
                                         </td>
                                         <td className="py-3 px-2 border-r border-[#eee] text-[#333] whitespace-nowrap">
                                             <span className={`font-bold ${contestStatus === 'running' ? 'text-[#00a900]' :
-                                                    contestStatus === 'paused' ? 'text-[#ff8c00]' :
-                                                        contestStatus === 'ended' ? 'text-[#cc0000]' : 'text-[#888]'
+                                                contestStatus === 'paused' ? 'text-[#ff8c00]' :
+                                                    contestStatus === 'ended' ? 'text-[#cc0000]' : 'text-[#888]'
                                                 }`}>
                                                 {contestStatus.toUpperCase().replace('_', ' ')}
                                             </span>
                                         </td>
-                                        <td className="py-3 px-2 border-r border-[#eee] text-[#333]">
+                                        <td className="py-3 px-2 border-r border-[#eee] text-[#333] whitespace-nowrap">
                                             {currentContest.length}
                                         </td>
                                         <td className="py-3 px-2 border-r border-[#eee]">
@@ -92,9 +92,9 @@ const DashboardPage = () => {
                 </div>
 
                 {/* Right Column (Sidebar) */}
-                <div className="w-[280px] flex flex-col gap-4">
+                <div className="w-full lg:w-[280px] flex flex-col sm:flex-row lg:flex-col gap-4">
                     {/* Pay attention box */}
-                    <div className="bg-white border border-[#b9b9b9] shadow-sm rounded-sm overflow-hidden">
+                    <div className="bg-white border border-[#b9b9b9] shadow-sm rounded-sm overflow-hidden flex-1">
                         <div className="border-b border-[#b9b9b9] bg-[#e1e1e1] text-[#333] font-bold py-[6px] px-3 text-[13px]">
                             → Pay attention
                         </div>
@@ -107,7 +107,7 @@ const DashboardPage = () => {
                     </div>
 
                     {/* Find user box */}
-                    <div className="bg-white border border-[#b9b9b9] shadow-sm rounded-sm overflow-hidden">
+                    <div className="bg-white border border-[#b9b9b9] shadow-sm rounded-sm overflow-hidden flex-1">
                         <div className="border-b border-[#b9b9b9] bg-[#e1e1e1] text-[#333] font-bold py-[6px] px-3 text-[13px]">
                             Find team
                         </div>
@@ -124,7 +124,7 @@ const DashboardPage = () => {
             </div>
 
             {/* Footer */}
-            <div className="mt-12 text-[11px] text-[#666] border-t border-[#ccc] w-full max-w-[1000px] text-center pt-2">
+            <div className="mt-12 text-[11px] text-[#666] border-t border-[#ccc] w-full max-w-[1000px] text-center pt-2 pb-4">
                 <a href="#" className="text-[#0000cc] hover:underline mx-1">CodeQuest</a>
                 by Team (c) Copyright 2026<br />
                 Server time: <span>{new Date().toISOString().replace('T', ' ').split('.')[0]}</span>

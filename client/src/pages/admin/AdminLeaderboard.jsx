@@ -36,10 +36,14 @@ const AdminLeaderboard = () => {
         }
     };
 
-    if (loading) return <div className="p-10 font-sans text-center">Loading Admin Leaderboard...</div>;
+    if (loading) return (
+        <div className="flex justify-center items-center py-8 min-h-screen">
+            <div className="w-8 h-8 rounded-full border-4 border-[#0000cc] border-t-transparent animate-spin"></div>
+        </div>
+    );
 
     return (
-        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4">
+        <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4 px-2 sm:px-4">
             <AdminNavbar activeTab="LEADERBOARD" />
 
             <div className="w-full max-w-[1200px]">

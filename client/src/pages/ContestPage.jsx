@@ -8,23 +8,48 @@ const ContestPage = () => {
     const navigate = useNavigate();
     const [riddles, setRiddles] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [contestStatus, setContestStatus] = useState('loading');
+    const [canUnlockPenalty, setCanUnlockPenalty] = useState(false);
+    const [penaltyDeadline, setPenaltyDeadline] = useState(null);
 
-    useEffect(() => {
-        const fetchRiddles = async () => {
-            try {
+    const fetchContestData = async () => {
+        try {
+            const statusRes = await axios.get(`${import.meta.env.VITE_API_URL}/system/status`, {
+                withCredentials: true
+            });
+            setContestStatus(statusRes.data.contestStatus);
+
+            if (statusRes.data.contestStatus === 'running' || statusRes.data.contestStatus === 'ended') {
                 const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/riddles`, {
                     withCredentials: true
                 });
-                setRiddles(data);
-            } catch (error) {
-                console.error("Error fetching riddles", error);
-                toast.error("Could not load contest riddles.");
-            } finally {
-                setLoading(false);
+                setRiddles(data.riddles || []);
+                setCanUnlockPenalty(data.canUnlockPenalty || false);
+                setPenaltyDeadline(data.penaltyDeadline || null);
             }
-        };
-        fetchRiddles();
+        } catch (error) {
+            console.error("Error fetching contest data", error);
+            toast.error("Could not load contest data.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchContestData();
     }, []);
+
+    const handleUnlockPenalty = async () => {
+        try {
+            const res = await axios.post(`${import.meta.env.VITE_API_URL}/riddles/penalty-unlock`, {}, {
+                withCredentials: true
+            });
+            toast.success(res.data.message);
+            fetchContestData(); // reload riddles
+        } catch (error) {
+            toast.error(error.response?.data?.error || "Error unlocking item");
+        }
+    };
 
     return (
         <div className="font-sans min-h-screen bg-[#f3f3f3] flex flex-col items-center py-4">
@@ -41,6 +66,14 @@ const ContestPage = () => {
                     <div className="p-0">
                         {loading ? (
                             <div className="p-4 text-center text-[#888]">Loading...</div>
+                        ) : contestStatus === 'not_started' ? (
+                            <div className="p-12 text-center text-[#333] font-bold text-lg">
+                                ⏳ The contest has not started yet! Please wait.
+                            </div>
+                        ) : contestStatus === 'paused' ? (
+                            <div className="p-12 text-center text-[#ff8c00] font-bold text-lg">
+                                ⏸️ The contest is currently paused.
+                            </div>
                         ) : riddles.length === 0 ? (
                             <div className="p-4 text-center text-[#888]">No active riddles found.</div>
                         ) : (
@@ -60,19 +93,28 @@ const ContestPage = () => {
                                                 {String.fromCharCode(65 + index)}
                                             </td>
                                             <td className="py-2 px-3 border-r border-[#eee]">
-                                                <button
-                                                    onClick={() => navigate(`/riddle/${riddle._id}`)}
-                                                    className="text-[#0000cc] hover:underline font-bold text-left"
-                                                >
-                                                    {riddle.title}
-                                                </button>
+                                                {riddle.status === 'permanently_locked' ? (
+                                                    <span className="text-[#888] line-through font-bold text-left cursor-not-allowed" title="Failed to solve in time">
+                                                        {riddle.title}
+                                                    </span>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => navigate(`/riddle/${riddle._id}`)}
+                                                        className="text-[#0000cc] hover:underline font-bold text-left"
+                                                    >
+                                                        {riddle.title}
+                                                        {riddle.isPenaltyTarget && <span className="ml-2 text-[10px] bg-[#cc0000] text-white px-[4px] py-[2px] rounded-sm font-normal">PENALTY</span>}
+                                                    </button>
+                                                )}
                                             </td>
                                             <td className="py-2 px-3 border-r border-[#eee] text-center text-[#444]">
                                                 {riddle.points}
                                             </td>
                                             <td className="py-2 px-3 text-center text-[12px]">
-                                                {riddle.isSolved ? (
+                                                {riddle.status === 'solved' ? (
                                                     <span className="text-[#00a900] font-bold">Solved</span>
+                                                ) : riddle.status === 'permanently_locked' ? (
+                                                    <span className="text-[#cc0000] font-bold">Locked</span>
                                                 ) : (
                                                     <span className="text-[#888]">-</span>
                                                 )}
@@ -81,6 +123,20 @@ const ContestPage = () => {
                                     ))}
                                 </tbody>
                             </table>
+                        )}
+
+                        {canUnlockPenalty && (
+                            <div className="p-4 border-t border-[#b9b9b9] bg-[#fff8e1] flex flex-col items-center">
+                                <p className="text-[13px] text-[#555] mb-2 text-center">
+                                    You haven't solved any riddle yet. You can unlock the next riddle, but it comes with a strict time limit!
+                                </p>
+                                <button
+                                    onClick={handleUnlockPenalty}
+                                    className="bg-[#ff8c00] text-white px-4 py-2 text-[13px] font-bold rounded-sm border border-[#e67e00] hover:bg-[#e67e00] cursor-pointer"
+                                >
+                                    Force Unlock Next Riddle
+                                </button>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -94,7 +150,18 @@ const ContestPage = () => {
                         <div className="p-3 text-[13px] text-[#333]">
                             <p className="mb-2"><strong>Name:</strong> CodeQuest 2026 Finals</p>
                             <p className="mb-2"><strong>Duration:</strong> 3 hours</p>
-                            <p className="mb-2 text-[#00a900]"><strong>Status:</strong> Running</p>
+                            <p className={`mb-2 font-bold ${contestStatus === 'running' ? 'text-[#00a900]' :
+                                contestStatus === 'paused' ? 'text-[#ff8c00]' :
+                                    contestStatus === 'ended' ? 'text-[#cc0000]' : 'text-[#888]'
+                                }`}>
+                                <strong>Status:</strong> {contestStatus.toUpperCase().replace('_', ' ')}
+                            </p>
+                            {penaltyDeadline && (
+                                <p className="mb-2 text-[#cc0000]">
+                                    <strong>Penalty Deadline:</strong><br />
+                                    {new Date(penaltyDeadline).toLocaleTimeString()}
+                                </p>
+                            )}
                             <hr className="my-2 border-[#eee]" />
                             <p className="text-[#666] leading-relaxed">
                                 Solve the riddle to unlock the corresponding coding challenge. Your time penalty includes incorrect coding submissions, not riddle attempts.

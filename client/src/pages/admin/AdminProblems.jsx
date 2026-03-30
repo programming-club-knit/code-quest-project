@@ -254,7 +254,7 @@ const AdminProblems = () => {
 
             {/* Modal for Creating/Editing Problems */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-sm shadow-lg w-full max-w-[700px] max-h-[90vh] overflow-y-auto border border-[#b9b9b9]">
                         <div className="sticky top-0 bg-[#e1e1e1] border-b border-[#b9b9b9] px-4 py-3 font-bold text-[#333] flex justify-between items-center">
                             <span>{editMode ? 'Edit Problem' : 'Create New Problem'}</span>

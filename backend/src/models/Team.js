@@ -54,6 +54,10 @@ const teamSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Riddle'
     }],
+    problemSequence: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Problem'
+    }],
     solvedRiddles: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Riddle'
@@ -61,6 +65,15 @@ const teamSchema = new mongoose.Schema({
     solvedProblems: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Problem'
+    }],
+    penaltyUnlock: {
+        triggered: { type: Boolean, default: false },
+        triggeredAt: { type: Date },
+        riddleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Riddle' }
+    },
+    permanentlyLockedRiddles: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Riddle'
     }],
     teamMembers: [teamMemberSchema]
 },

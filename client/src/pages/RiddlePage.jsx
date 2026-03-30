@@ -105,13 +105,7 @@ const RiddlePage = () => {
             {/* Main Content */}
             <div className="w-full max-w-[1000px] bg-white border border-[#b9b9b9] p-8 shadow-sm">
                 <div className="text-center mb-8 border-b border-[#eee] pb-6">
-                    <div className="text-[12px] bg-[#e1e1e1] text-[#333] px-2 py-1 mb-2 inline-block rounded-sm font-bold">
-                        {riddle.difficulty}
-                    </div>
                     <h2 className="text-[22px] font-normal mb-1">{riddle.title}</h2>
-                    <div className="text-[12px] text-[#888]">
-                        Points: {riddle.points}
-                    </div>
                 </div>
 
                 <div className="text-[14px] leading-relaxed text-[#333] max-w-[800px] mx-auto">

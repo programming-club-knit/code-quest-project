@@ -1,6 +1,7 @@
 import Submission from '../../models/Submission.js';
 import Problem from '../../models/Problem.js';
 import Team from '../../models/Team.js';
+import System from '../../models/System.js';
 import { submitCodeToJudge0, getStatusMessage } from '../../utils/judge0.js';
 
 export const submitCode = async (req, res) => {
@@ -8,10 +9,40 @@ export const submitCode = async (req, res) => {
         const { problemId, code, languageId } = req.body;
         const teamId = req.team.teamId;
 
+        // Check contest status
+        const system = await System.findOne({});
+        if (!system || system.contestStatus !== 'running') {
+            return res.status(403).json({ error: 'Contest is not currently running. Submissions are disabled.' });
+        }
+
+        const team = await Team.findById(teamId);
+
         // Fetch problem with test cases
         const problem = await Problem.findById(problemId);
         if (!problem) {
             return res.status(404).json({ error: 'Problem not found' });
+        }
+
+        // Before executing, check if problem is tied to a permanently locked riddle for this team
+        if (team.permanentlyLockedRiddles && team.permanentlyLockedRiddles.length > 0) {
+            // Find which riddle this problem is mapped to for THIS team
+            const probIndex = team.problemSequence.findIndex(id => id.toString() === problemId.toString());
+            // The mapping in getActiveProblemsByRiddle is: targetProblemId = problemSequence[riddleIndex % problemSequence.length]
+            // Because multiple riddles could map to the same problem if riddles > problems, we must check ALL riddles that map here.
+            let mappedRiddles = [];
+            if (probIndex !== -1) {
+                for (let i = 0; i < team.riddleSequence.length; i++) {
+                    if (i % team.problemSequence.length === probIndex) {
+                        mappedRiddles.push(team.riddleSequence[i].toString());
+                    }
+                }
+            }
+
+            const isLocked = mappedRiddles.some(rId => team.permanentlyLockedRiddles.map(id => id.toString()).includes(rId));
+
+            if (isLocked) {
+                return res.status(403).json({ error: 'This problem is permanently locked because you failed to solve it within the strict penalty time limit.' });
+            }
         }
 
         if (!Array.isArray(problem.testCases) || problem.testCases.length === 0) {
@@ -91,6 +122,14 @@ export const submitCode = async (req, res) => {
         }
 
         const isSubmissionAccepted = allTestsPassed ? 'Accepted' : (hasJudgeError ? 'Judge Error' : 'Failed');
+
+        // Update team solved problems if accepted and not already solved
+        if (isSubmissionAccepted === 'Accepted') {
+            if (!team.solvedProblems.includes(problemId)) {
+                team.solvedProblems.push(problemId);
+                await team.save();
+            }
+        }
 
         // Save submission to DB
         const submission = new Submission({

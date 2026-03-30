@@ -1,24 +1,19 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, {
-                teamLeaderEmail: email,
-                password
-            }, {
-                withCredentials: true
-            });
-            console.log('Login successful:', response.data);
+            await login(email, password);
             toast.success('Login successful! Redirecting...');
             setTimeout(() => {
                 navigate('/dashboard');

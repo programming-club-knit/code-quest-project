@@ -10,14 +10,16 @@ import riddlesRoutes from './modules/riddles/riddles.routes.js';
 import problemsRoutes from './modules/problems/problems.routes.js';
 import submissionsRoutes from './modules/submissions/submissions.routes.js';
 import leaderboardRoutes from './modules/leaderboard/leaderboard.routes.js';
+import systemRoutes from './modules/system/system.routes.js';
 
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: 'http://localhost:5173', // Your Vite React frontend URL
+    origin: true, // true mirrors the requesting origin, allowing ANY origin
     credentials: true // Allow cookies to be sent with requests
+
 }));
 
 // Connect to MongoDB
@@ -30,6 +32,7 @@ app.use('/api/riddles', riddlesRoutes);
 app.use('/api/problems', problemsRoutes);
 app.use('/api/submissions', submissionsRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
+app.use('/api/system', systemRoutes);
 
 const PORT = process.env.PORT || 3000;
 

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const riddleSchema = new mongoose.Schema({
     title: {
@@ -8,16 +8,6 @@ const riddleSchema = new mongoose.Schema({
     description: {
         type: String,
         required: true
-    },
-    difficulty: {
-        type: String,
-        enum: ['Easy', 'Medium', 'Hard'],
-        default: 'Medium'
-    },
-    points: {
-        type: Number,
-        required: true,
-        default: 10
     },
     answer: {
         type: String,
@@ -29,6 +19,6 @@ const riddleSchema = new mongoose.Schema({
     },
 }, { timestamps: true });
 
-const Riddle = mongoose.model('Riddle', riddleSchema);
+const Riddle = mongoose.model("Riddle", riddleSchema);
 
 export default Riddle;

@@ -1,6 +1,10 @@
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import './App.css'
+import { AuthProvider } from './context/AuthContext'
+import ProtectedRoute from './components/ProtectedRoute'
+import PublicRoute from './components/PublicRoute'
+
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
@@ -23,31 +27,33 @@ import AdminLeaderboard from './pages/admin/AdminLeaderboard'
 function App() {
 
   return (
-    <>
+    <AuthProvider>
       <BrowserRouter>
         <Routes>
           {/* User Routes */}
           <Route path='/' element={<Navigate to="/login" replace />} />
-          <Route path='/login' element={<LoginPage />} />
-          <Route path='/register' element={<RegisterPage />} />
-          <Route path='/dashboard' element={<DashboardPage />} />
-          <Route path='/profile' element={<ProfilePage />} />
-          <Route path='/leaderboard' element={<LeaderboardPage />} />
-          <Route path='/submissions' element={<SubmissionsPage />} />
-          <Route path='/contest' element={<ContestPage />} />
-          <Route path='/riddle/:id' element={<RiddlePage />} />
-          <Route path='/problem/:id' element={<ProblemPage />} />
+          <Route path='/login' element={<PublicRoute><LoginPage /></PublicRoute>} />
+          <Route path='/register' element={<PublicRoute><RegisterPage /></PublicRoute>} />
+
+          <Route path='/dashboard' element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+          <Route path='/profile' element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route path='/leaderboard' element={<ProtectedRoute><LeaderboardPage /></ProtectedRoute>} />
+          <Route path='/submissions' element={<ProtectedRoute><SubmissionsPage /></ProtectedRoute>} />
+          <Route path='/contest' element={<ProtectedRoute><ContestPage /></ProtectedRoute>} />
+          <Route path='/riddle/:id' element={<ProtectedRoute><RiddlePage /></ProtectedRoute>} />
+          <Route path='/problem/:id' element={<ProtectedRoute><ProblemPage /></ProtectedRoute>} />
 
           {/* Admin Routes */}
           <Route path='/admin' element={<Navigate to="/admin/login" replace />} />
           <Route path='/admin/login' element={<AdminLogin />} />
           <Route path='/admin/dashboard' element={<AdminDashboard />} />
           <Route path='/admin/teams' element={<AdminTeams />} />
-          <Route path='/admin/riddles' element={<AdminRiddles />} />          <Route path='/admin/problems' element={<AdminProblems />} />          <Route path='/admin/submissions' element={<AdminSubmissions />} />
+          <Route path='/admin/riddles' element={<AdminRiddles />} />          <Route path='/admin/problems' element={<AdminProblems />} />
+          <Route path='/admin/submissions' element={<AdminSubmissions />} />
           <Route path='/admin/leaderboard' element={<AdminLeaderboard />} />
         </Routes>
       </BrowserRouter>
-    </>
+    </AuthProvider>
   )
 }
 

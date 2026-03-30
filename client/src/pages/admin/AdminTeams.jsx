@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import AdminNavbar from '../../components/AdminNavbar';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import AdminNavbar from "../../components/AdminNavbar";
 
 const AdminTeams = () => {
     const [teams, setTeams] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [expandedTeamId, setExpandedTeamId] = useState(null);
 
     const fetchTeams = async () => {
         try {
@@ -14,8 +15,8 @@ const AdminTeams = () => {
             });
             setTeams(data);
         } catch (error) {
-            console.error('Error fetching teams:', error);
-            toast.error('Failed to load teams');
+            console.error("Error fetching teams:", error);
+            toast.error("Failed to load teams");
         } finally {
             setLoading(false);
         }
@@ -26,46 +27,54 @@ const AdminTeams = () => {
     }, []);
 
     const handleAction = async (id, action) => {
-        let endpoint = '';
-        let method = 'put';
+        let endpoint = "";
+        let method = "put";
 
-        if (action === 'VERIFY') {
+        if (action === "VERIFY") {
             endpoint = `/admin/teams/${id}/verify`;
-        } else if (action === 'UNVERIFY') {
+        } else if (action === "UNVERIFY") {
             endpoint = `/admin/teams/${id}/unverify`;
-        } else if (action === 'DISQUALIFY') {
-            if (!window.confirm('Are you sure you want to disqualify this team?')) return;
+        } else if (action === "DISQUALIFY") {
+            if (!window.confirm("Are you sure you want to disqualify this team?")) return;
             endpoint = `/admin/teams/${id}`;
-            method = 'delete';
+            method = "delete";
         }
 
         try {
-            if (method === 'put') {
+            if (method === "put") {
                 await axios.put(`${import.meta.env.VITE_API_URL}${endpoint}`, {}, { withCredentials: true });
-            } else if (method === 'delete') {
+            } else if (method === "delete") {
                 await axios.delete(`${import.meta.env.VITE_API_URL}${endpoint}`, { withCredentials: true });
             }
 
             toast.success(`Team successfully ${action.toLowerCase()}d!`);
-            fetchTeams(); // Refresh the list
+            fetchTeams();
         } catch (error) {
             console.error(`Error performing ${action}:`, error);
             toast.error(`Failed to ${action.toLowerCase()} team.`);
         }
     };
 
+    const toggleExpand = (id) => {
+        if (expandedTeamId === id) {
+            setExpandedTeamId(null);
+        } else {
+            setExpandedTeamId(id);
+        }
+    };
+
     const getTeamStatus = (team) => {
-        if (team.isDisqualified) return 'Disqualified';
-        if (team.isVerified) return 'Verified';
-        return 'Pending';
+        if (team.isDisqualified) return "Disqualified";
+        if (team.isVerified) return "Verified";
+        return "Pending";
     };
 
     const getStatusStyle = (status) => {
         switch (status) {
-            case 'Verified': return 'text-[#00a900] font-bold';
-            case 'Pending': return 'text-[#ff8c00] font-bold';
-            case 'Disqualified': return 'text-[#cc0000] font-bold line-through';
-            default: return 'text-[#333]';
+            case "Verified": return "text-[#00a900] font-bold";
+            case "Pending": return "text-[#ff8c00] font-bold";
+            case "Disqualified": return "text-[#cc0000] font-bold line-through";
+            default: return "text-[#333]";
         }
     };
 
@@ -90,7 +99,6 @@ const AdminTeams = () => {
                                         <th className="py-2 px-2">Team Name</th>
                                         <th className="py-2 px-2">Leader</th>
                                         <th className="py-2 px-2">Leader Email</th>
-                                        <th className="py-2 px-2">Members</th>
                                         <th className="py-2 px-2">Status</th>
                                         <th className="py-2 px-2 text-right">Actions</th>
                                     </tr>
@@ -98,25 +106,61 @@ const AdminTeams = () => {
                                 <tbody>
                                     {teams.map((team, index) => {
                                         const status = getTeamStatus(team);
+                                        const isExpanded = expandedTeamId === team._id;
                                         return (
-                                            <tr key={team._id} className={`border-b border-[#eee] ${index % 2 === 0 ? 'bg-white' : 'bg-[#fafafa]'}`}>
-                                                <td className="py-2 px-2 font-bold text-[#0000cc]">{team.teamName}</td>
-                                                <td className="py-2 px-2">{team.teamLeaderName}</td>
-                                                <td className="py-2 px-2 text-[#0000cc]">{team.teamLeaderEmail}</td>
-                                                <td className="py-2 px-2">{team.teamMembers?.length || 0}</td>
-                                                <td className={`py-2 px-2 ${getStatusStyle(status)}`}>{status}</td>
-                                                <td className="py-2 px-2 text-right flex gap-2 justify-end">
-                                                    {status !== 'Verified' && status !== 'Disqualified' && (
-                                                        <button onClick={() => handleAction(team._id, 'VERIFY')} className="text-[#00a900] hover:underline hover:text-[#007700]">Verify</button>
-                                                    )}
-                                                    {status === 'Verified' && (
-                                                        <button onClick={() => handleAction(team._id, 'UNVERIFY')} className="text-[#ff8c00] hover:underline hover:text-[#cc7000]">Unverify</button>
-                                                    )}
-                                                    {status !== 'Disqualified' && (
-                                                        <button onClick={() => handleAction(team._id, 'DISQUALIFY')} className="text-[#cc0000] hover:underline hover:text-[#990000]">Disqualify</button>
-                                                    )}
-                                                </td>
-                                            </tr>
+                                            <React.Fragment key={team._id}>
+                                                <tr
+                                                    className={`border-b border-[#eee] hover:bg-[#eaeaea] cursor-pointer ${index % 2 === 0 ? "bg-white" : "bg-[#fafafa]"}`}
+                                                    onClick={() => toggleExpand(team._id)}
+                                                >
+                                                    <td className="py-2 px-2 font-bold text-[#0000cc]">
+                                                        {isExpanded ? "? " : "? "} {team.teamName}
+                                                    </td>
+                                                    <td className="py-2 px-2">{team.teamLeaderName}</td>
+                                                    <td className="py-2 px-2 text-[#0000cc]">{team.teamLeaderEmail}</td>
+                                                    <td className={`py-2 px-2 ${getStatusStyle(status)}`}>{status}</td>
+                                                    <td className="py-2 px-2 text-right flex gap-2 justify-end" onClick={(e) => e.stopPropagation()}>
+                                                        {status !== "Verified" && status !== "Disqualified" && (
+                                                            <button onClick={() => handleAction(team._id, "VERIFY")} className="text-[#00a900] hover:underline hover:text-[#007700]">Verify</button>
+                                                        )}
+                                                        {status === "Verified" && (
+                                                            <button onClick={() => handleAction(team._id, "UNVERIFY")} className="text-[#ff8c00] hover:underline hover:text-[#cc7000]">Unverify</button>
+                                                        )}
+                                                        {status !== "Disqualified" && (
+                                                            <button onClick={() => handleAction(team._id, "DISQUALIFY")} className="text-[#cc0000] hover:underline hover:text-[#990000]">Disqualify</button>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                                {isExpanded && (
+                                                    <tr className="bg-[#f9f9f9] border-b border-[#ccc]">
+                                                        <td colSpan="5" className="p-4 text-[12px] text-[#444]">
+                                                            <div className="grid grid-cols-2 gap-4">
+                                                                <div>
+                                                                    <p><strong>Mobile No:</strong> {team.mobileNo}</p>
+                                                                    <p><strong>Branch:</strong> {team.branch}</p>
+                                                                    <p><strong>Year:</strong> {team.year}</p>
+                                                                    <p><strong>Roll No:</strong> {team.rollNo}</p>
+                                                                </div>
+                                                                <div>
+                                                                    <p><strong>Team Members:</strong></p>
+                                                                    <ul className="list-disc ml-5 mt-1">
+                                                                        {team.teamMembers && team.teamMembers.length > 0 ? (
+                                                                            team.teamMembers.map((m, i) => (
+                                                                                <li key={i}>{m.name} ({m.email} - {m.rollNo})</li>
+                                                                            ))
+                                                                        ) : (
+                                                                            <li>No additional members</li>
+                                                                        )}
+                                                                    </ul>
+                                                                </div>
+                                                                <div className="col-span-2 mt-2">
+                                                                    <p><strong>Created At:</strong> {new Date(team.createdAt).toLocaleString()}</p>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </React.Fragment>
                                         )
                                     })}
                                 </tbody>

@@ -1,9 +1,23 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import Navbar from '../components/Navbar';
 
 const DashboardPage = () => {
     const navigate = useNavigate();
+    const [contestStatus, setContestStatus] = useState('loading');
+
+    useEffect(() => {
+        const fetchStatus = async () => {
+            try {
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/system/status`);
+                setContestStatus(res.data.contestStatus);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        fetchStatus();
+    }, []);
 
     // Mock data for the current contest
     const currentContest = {
@@ -32,7 +46,7 @@ const DashboardPage = () => {
                                 <thead>
                                     <tr className="border-b border-[#b9b9b9] bg-[#f9f9f9] text-[#222]">
                                         <th className="py-2 px-2 font-normal border-r border-[#eee]">Name</th>
-                                        <th className="py-2 px-2 font-normal border-r border-[#eee]">Start</th>
+                                        <th className="py-2 px-2 font-normal border-r border-[#eee]">Status</th>
                                         <th className="py-2 px-2 font-normal border-r border-[#eee]">Length</th>
                                         <th className="py-2 px-2 font-normal border-r border-[#eee] w-[140px]">Registration</th>
                                     </tr>
@@ -46,7 +60,12 @@ const DashboardPage = () => {
                                             </button>
                                         </td>
                                         <td className="py-3 px-2 border-r border-[#eee] text-[#333] whitespace-nowrap">
-                                            {currentContest.startTime}
+                                            <span className={`font-bold ${contestStatus === 'running' ? 'text-[#00a900]' :
+                                                    contestStatus === 'paused' ? 'text-[#ff8c00]' :
+                                                        contestStatus === 'ended' ? 'text-[#cc0000]' : 'text-[#888]'
+                                                }`}>
+                                                {contestStatus.toUpperCase().replace('_', ' ')}
+                                            </span>
                                         </td>
                                         <td className="py-3 px-2 border-r border-[#eee] text-[#333]">
                                             {currentContest.length}

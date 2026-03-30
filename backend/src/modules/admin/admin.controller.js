@@ -75,9 +75,9 @@ export const disqualifyTeam = async (req, res) => {
 
 export const createRiddle = async (req, res) => {
     try {
-        const { title, description, difficulty, points, answer, isActive } = req.body;
+        const { title, description, answer, isActive } = req.body;
         const newRiddle = new Riddle({
-            title, description, difficulty, points, answer, isActive
+            title, description, answer, isActive
         });
         await newRiddle.save();
         res.status(201).json({ message: 'Riddle created successfully', riddle: newRiddle });

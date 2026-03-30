@@ -103,14 +103,62 @@ const executeAgainstTestCases = async ({ code, languageId, testCases, problem })
 export const getActiveProblemsByRiddle = async (req, res) => {
     try {
         const { riddleId } = req.query;
-        const filter = { isActive: true };
 
         if (riddleId) {
-            filter.riddleId = riddleId;
+            const teamId = req.team.teamId;
+            const team = await Team.findById(teamId);
+
+            // 1. Ensure problemSequence exists and is up to date
+            const allActiveProblems = await Problem.find({ isActive: true }).select('_id');
+            const activeProblemIds = allActiveProblems.map(p => p._id.toString());
+            const currentProbSeq = (team.problemSequence || []).map(id => id.toString());
+
+            let newProbIds = activeProblemIds.filter(id => !currentProbSeq.includes(id));
+            const validProbSeqIds = currentProbSeq.filter(id => activeProblemIds.includes(id));
+
+            let shouldSaveProb = false;
+
+            if (validProbSeqIds.length !== currentProbSeq.length) {
+                shouldSaveProb = true;
+            }
+
+            if (newProbIds.length > 0) {
+                for (let i = newProbIds.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [newProbIds[i], newProbIds[j]] = [newProbIds[j], newProbIds[i]];
+                }
+                validProbSeqIds.push(...newProbIds);
+                shouldSaveProb = true;
+            }
+
+            if (shouldSaveProb || !team.problemSequence) {
+                team.problemSequence = validProbSeqIds;
+                await team.save();
+            }
+
+            // 2. Find the index of this riddle in the team's randomized riddleSequence
+            const riddleIndex = team.riddleSequence.findIndex(id => id.toString() === riddleId.toString());
+
+            let targetProblemId = null;
+
+            if (riddleIndex !== -1 && team.problemSequence.length > 0) {
+                // Map the riddle index to the problem index using modulo in case there are fewer problems than riddles
+                targetProblemId = team.problemSequence[riddleIndex % team.problemSequence.length];
+            } else if (team.problemSequence.length > 0) {
+                // Fallback constraint
+                targetProblemId = team.problemSequence[0];
+            }
+
+            if (targetProblemId) {
+                const problem = await Problem.findById(targetProblemId).select('-testCases');
+                return res.status(200).json([problem]); // Wrap in array because frontend expects data[0]
+            } else {
+                return res.status(200).json([]);
+            }
         }
 
-        const problems = await Problem.find(filter)
-            .populate('riddleId', 'title')
+        // If no riddleId is requested, return all active problems
+        const problems = await Problem.find({ isActive: true })
             .select('-testCases')
             .sort({ createdAt: 1 });
 
@@ -126,9 +174,29 @@ export const getProblemById = async (req, res) => {
         const { id } = req.params;
         const teamId = req.team.teamId;
 
+        const team = await Team.findById(teamId);
         const problem = await Problem.findById(id).populate('riddleId', 'title');
         if (!problem) {
             return res.status(404).json({ error: 'Problem not found' });
+        }
+
+        // Check if permanently locked for this team
+        if (team.permanentlyLockedRiddles && team.permanentlyLockedRiddles.length > 0) {
+            const probIndex = team.problemSequence.findIndex(pId => pId.toString() === id.toString());
+            let mappedRiddles = [];
+            if (probIndex !== -1) {
+                for (let i = 0; i < team.riddleSequence.length; i++) {
+                    if (i % team.problemSequence.length === probIndex) {
+                        mappedRiddles.push(team.riddleSequence[i].toString());
+                    }
+                }
+            }
+
+            const isLocked = mappedRiddles.some(rId => team.permanentlyLockedRiddles.map(trId => trId.toString()).includes(rId));
+
+            if (isLocked) {
+                return res.status(403).json({ error: 'This problem is permanently locked because you failed to solve the penalty in time.' });
+            }
         }
 
         // Only send visible test cases to users

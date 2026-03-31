@@ -167,19 +167,17 @@ const AdminSubmissions = () => {
                                     <div className="space-y-2">
                                         {selectedSubmission.results.map((res, i) => (
                                             <div key={i} className={`p-2 border rounded ${res.passed ? 'border-[#00a900] bg-[#e6ffe6]' : 'border-[#cc0000] bg-[#ffe6e6]'}`}>
-                                                <p><strong>Test {i + 1}:</strong> {res.passed ? 'Passed' : 'Failed'}</p>
-                                                {!res.passed && !res.isHidden && (
-                                                    <div className="text-xs mt-1 grid grid-cols-2 gap-2">
-                                                        <div><strong className="block text-gray-700">Input:</strong> <pre className="bg-white border p-1 rounded overflow-x-auto">{res.input}</pre></div>
-                                                        <div>
-                                                            <strong className="block text-gray-700">Expected:</strong> <pre className="bg-white border p-1 rounded overflow-x-auto">{res.expectedOutput}</pre>
-                                                            <strong className="block text-gray-700 mt-1">Actual:</strong> <pre className="bg-white border p-1 rounded overflow-x-auto">{res.actualOutput}</pre>
-                                                        </div>
+                                                <p>
+                                                    <strong>Test {i + 1}:</strong> {res.passed ? 'Passed' : 'Failed'}
+                                                    {res.isHidden && <span className="ml-2 text-xs font-bold text-[#888] bg-[#e1e1e1] px-1 rounded">(Hidden Test)</span>}
+                                                </p>
+                                                <div className="text-xs mt-2 grid grid-cols-2 gap-2">
+                                                    <div><strong className="block text-gray-700">Input:</strong> <pre className="bg-white border p-1 rounded overflow-x-auto">{res.input}</pre></div>
+                                                    <div>
+                                                        <strong className="block text-gray-700">Expected:</strong> <pre className="bg-white border p-1 rounded overflow-x-auto">{res.expectedOutput}</pre>
+                                                        <strong className="block text-gray-700 mt-1">Actual:</strong> <pre className="bg-white border p-1 rounded overflow-x-auto">{res.actualOutput}</pre>
                                                     </div>
-                                                )}
-                                                {!res.passed && res.isHidden && (
-                                                    <p className="text-xs italic text-gray-500 mt-1">Hidden test case</p>
-                                                )}
+                                                </div>
                                             </div>
                                         ))}
                                     </div>

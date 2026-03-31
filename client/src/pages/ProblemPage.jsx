@@ -5,12 +5,57 @@ import { toast } from 'react-toastify';
 import Editor from '@monaco-editor/react';
 
 const languageOptions = [
-    { key: 'cpp', label: 'GNU C++20 (64)', judge0Id: 54 },
-    { key: 'java', label: 'Java 17', judge0Id: 62 },
-    { key: 'python', label: 'Python 3', judge0Id: 71 },
-    { key: 'javascript', label: 'JavaScript (Node.js)', judge0Id: 63 }
-];
+    {
+        key: "c",
+        label: "C",
+        judge0Id: 50,
+        starterCode: `#include <stdio.h>
 
+int main() {
+    // your code here
+    printf("Hello, World!\\n");
+    return 0;
+}`
+    },
+    {
+        key: "cpp",
+        label: "GNU C++20 (64)",
+        judge0Id: 54,
+        starterCode: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    // your code here
+    cout << "Hello, World!" << endl;
+    return 0;
+}`
+    },
+    {
+        key: "java",
+        label: "Java 17",
+        judge0Id: 62,
+        starterCode: `public class Main {
+    public static void main(String[] args) {
+        // your code here
+        System.out.println("Hello, World!");
+    }
+}`
+    },
+    {
+        key: "python",
+        label: "Python 3",
+        judge0Id: 71,
+        starterCode: `# your code here
+print("Hello, World!")`
+    },
+    {
+        key: "javascript",
+        label: "JavaScript (Node.js)",
+        judge0Id: 63,
+        starterCode: `// your code here
+console.log("Hello, World!");`
+    }
+];
 const outputThemeByVerdict = (verdict) => {
     if (verdict === 'Accepted') return 'text-[#0d7d31] bg-[#eaf9ee] border-[#84d9a1]';
     if (verdict === 'Judge Error') return 'text-[#8a5c00] bg-[#fff7e8] border-[#f1c36e]';
@@ -59,7 +104,13 @@ const ProblemPage = () => {
 
         fetchProblem();
     }, [id, navigate]);
-
+    // added for starter code update when language changes
+    useEffect(() => {
+        const selected = languageOptions.find(l => l.key === language);
+        if (selected) {
+            setSourceCode(selected.starterCode);
+        }
+    }, [language]);
     const handleRun = async () => {
         if (!sourceCode.trim()) {
             toast.error('Please write code before running.');
@@ -160,43 +211,43 @@ const ProblemPage = () => {
     const sampleCase = problem.testCases?.[0];
 
     return (
-        <div className="min-h-screen bg-[#f7f8fb] text-[#1f2937] flex flex-col">
-            <div className="min-h-[48px] py-2 md:py-0 border-b border-[#e5e7eb] bg-white px-3 flex flex-col md:flex-row items-start md:items-center justify-between text-xs gap-2 md:gap-0">
-                <div className="flex flex-wrap items-center gap-2 md:gap-3 w-full md:w-auto">
-                    <div className="flex flex-wrap items-center gap-2 md:border-r border-[#e5e7eb] pr-0 md:pr-3">
-                        <img src="/logo.png" alt="PTSC Logo" className="h-6 md:h-8 object-contain" />
-                        <div className="hidden md:block h-5 w-px bg-[#d1d5db]"></div>
-                        <img src="/knitlogo.png" alt="KNIT Logo" className="h-5 md:h-7 object-contain" />
+        <div className="min-h-screen bg-[#f7f8fb] text-[#1f2937]">
+            <div className="h-12 border-b border-[#e5e7eb] bg-white px-3 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 border-r border-[#e5e7eb] pr-3">
+                        <img src="/logo.png" alt="PTSC Logo" className="h-8 object-contain" />
+                        <div className="h-5 w-px bg-[#d1d5db]"></div>
+                        <img src="/knitlogo.png" alt="KNIT Logo" className="h-7 object-contain" />
                     </div>
                     <button
                         onClick={() => navigate('/contest')}
-                        className="h-6 px-2 border border-[#d1d5db] rounded bg-[#f9fafb] hover:bg-[#f3f4f6] text-[#111827] mt-1 md:mt-0"
+                        className="h-6 px-2 border border-[#d1d5db] rounded bg-[#f9fafb] hover:bg-[#f3f4f6] text-[#111827]"
                     >
                         Back
                     </button>
-                    <span className="text-[#6b7280] hidden sm:inline">Problem</span>
-                    <span className="text-[#111827] font-semibold truncate w-full sm:w-auto max-w-full sm:max-w-[280px]">{problem.title}</span>
+                    <span className="text-[#6b7280]">Problem</span>
+                    <span className="text-[#111827] font-semibold truncate max-w-[280px]">{problem.title}</span>
                 </div>
-                <div className="flex items-center gap-2 text-[11px] sm:text-xs">
-                    <span className="text-[#6b7280] bg-[#f3f4f6] px-2 py-0.5 rounded">{problem.difficulty}</span>
-                    <span className="text-[#6b7280] bg-[#f3f4f6] px-2 py-0.5 rounded">{problem.points} pts</span>
-                    {problem.isSolved && <span className="text-[#16a34a] font-semibold px-2">Solved</span>}
+                <div className="flex items-center gap-2">
+                    <span className="text-[#6b7280]">{problem.difficulty}</span>
+                    <span className="text-[#6b7280]">{problem.points} pts</span>
+                    {problem.isSolved && <span className="text-[#16a34a] font-semibold">Solved</span>}
                 </div>
             </div>
 
-            <div className="flex-1 p-2 md:p-3 overflow-hidden">
-                <div className="h-full grid grid-cols-1 lg:grid-cols-2 gap-3 pb-8 md:pb-0 overflow-y-auto lg:overflow-hidden">
-                    <div className="bg-white border border-[#e5e7eb] rounded-md overflow-hidden flex flex-col min-h-[400px] lg:min-h-0 lg:h-full">
-                        <div className="min-h-[36px] border-b border-[#e5e7eb] flex items-center text-xs text-[#6b7280] bg-[#fafafa] flex-wrap">
+            <div className="h-[calc(100vh-48px)] p-2 md:p-3">
+                <div className="h-full grid grid-cols-1 lg:grid-cols-2 gap-3">
+                    <div className="bg-white border border-[#e5e7eb] rounded-md overflow-hidden flex flex-col min-h-[320px]">
+                        <div className="h-9 border-b border-[#e5e7eb] flex items-center text-xs text-[#6b7280] bg-[#fafafa]">
                             <button
                                 onClick={() => setLeftActiveTab('description')}
-                                className={`px-4 py-2 sm:py-0 sm:h-full border-r border-b sm:border-b-0 border-[#e5e7eb] ${leftActiveTab === 'description' ? 'text-[#111827] bg-white font-semibold' : 'hover:bg-[#f3f4f6]'}`}
+                                className={`px-4 h-full border-r border-[#e5e7eb] ${leftActiveTab === 'description' ? 'text-[#111827] bg-white font-semibold' : 'hover:bg-[#f3f4f6]'}`}
                             >
                                 Description
                             </button>
                             <button
                                 onClick={() => setLeftActiveTab('submissions')}
-                                className={`px-4 py-2 sm:py-0 sm:h-full border-r border-[#e5e7eb] ${leftActiveTab === 'submissions' ? 'text-[#111827] bg-white font-semibold' : 'hover:bg-[#f3f4f6]'}`}
+                                className={`px-4 h-full border-r border-[#e5e7eb] ${leftActiveTab === 'submissions' ? 'text-[#111827] bg-white font-semibold' : 'hover:bg-[#f3f4f6]'}`}
                             >
                                 Submissions
                             </button>
@@ -296,8 +347,8 @@ const ProblemPage = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white border border-[#e5e7eb] rounded-md overflow-hidden flex flex-col min-h-[500px] lg:min-h-0 lg:h-full">
-                        <div className="min-h-[36px] border-b border-[#e5e7eb] px-3 py-2 sm:py-0 flex flex-wrap items-center justify-between gap-2 text-xs bg-[#fafafa]">
+                    <div className="bg-white border border-[#e5e7eb] rounded-md overflow-hidden flex flex-col min-h-[320px]">
+                        <div className="h-9 border-b border-[#e5e7eb] px-3 flex items-center justify-between text-xs bg-[#fafafa]">
                             <div className="flex items-center gap-2 text-[#6b7280]">
                                 <span className="text-[#111827] font-semibold">Code</span>
                                 <select
@@ -329,7 +380,7 @@ const ProblemPage = () => {
                             </div>
                         </div>
 
-                        <div className="flex-1 min-h-[300px] lg:min-h-[260px]">
+                        <div className="flex-1 min-h-[260px]">
                             <Editor
                                 height="100%"
                                 language={language}
@@ -345,18 +396,18 @@ const ProblemPage = () => {
                             />
                         </div>
 
-                        <div className="h-auto lg:h-[34%] min-h-[250px] lg:min-h-[210px] border-t border-[#e5e7eb] bg-white flex flex-col">
-                            <div className="min-h-[36px] py-1 border-b border-[#e5e7eb] flex flex-wrap items-center justify-between gap-2 text-xs bg-[#fafafa] px-2">
+                        <div className="h-[34%] min-h-[210px] border-t border-[#e5e7eb] bg-white flex flex-col">
+                            <div className="h-9 border-b border-[#e5e7eb] flex items-center justify-between text-xs bg-[#fafafa] px-2">
                                 <div className="flex bg-[#fafafa] h-full">
                                     <button
                                         onClick={() => setTestcaseActiveTab('testcase')}
-                                        className={`px-3 py-1.5 sm:py-0 sm:h-8 border-r border-[#e5e7eb] ${testcaseActiveTab === 'testcase' ? 'text-[#111827] bg-white font-semibold' : 'text-[#6b7280] hover:bg-[#f3f4f6]'}`}
+                                        className={`px-3 h-8 border-r border-[#e5e7eb] ${testcaseActiveTab === 'testcase' ? 'text-[#111827] bg-white font-semibold' : 'text-[#6b7280] hover:bg-[#f3f4f6]'}`}
                                     >
                                         Testcase
                                     </button>
                                     <button
                                         onClick={() => setTestcaseActiveTab('result')}
-                                        className={`px-3 py-1.5 sm:py-0 sm:h-8 ${testcaseActiveTab === 'result' ? 'text-[#111827] bg-white font-semibold' : 'text-[#6b7280] hover:bg-[#f3f4f6]'}`}
+                                        className={`px-3 h-8 ${testcaseActiveTab === 'result' ? 'text-[#111827] bg-white font-semibold' : 'text-[#6b7280] hover:bg-[#f3f4f6]'}`}
                                     >
                                         Test Result
                                     </button>

@@ -13,6 +13,10 @@ const riddleSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    points: {
+        type: Number,
+        default: 50
+    },
     isActive: {
         type: Boolean,
         default: true

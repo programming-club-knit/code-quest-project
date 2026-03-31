@@ -48,7 +48,8 @@ const RiddlePage = () => {
                 }
             } catch (error) {
                 console.error("Error fetching riddle:", error);
-                toast.error("Failed to load riddle");
+                const errorMsg = error.response?.data?.error || "Failed to load riddle";
+                toast.error(errorMsg);
                 navigate('/contest');
             } finally {
                 setLoading(false);

@@ -98,7 +98,7 @@ export const getActiveRiddles = async (req, res) => {
         let canUnlockPenalty = false;
         if (system && system.contestStatus === 'running' && team.solvedRiddles.length === 0 && (!team.penaltyUnlock || !team.penaltyUnlock.triggered)) {
             const diffMins = (new Date() - system.contestStartTime) / 60000;
-            const timeoutLimit = system.timeoutMinutes || 30;
+            const timeoutLimit = system.timeoutMinutes || 10;
             if (diffMins >= timeoutLimit && team.riddleSequence.length >= 3) {
                 canUnlockPenalty = true;
             }
@@ -137,10 +137,10 @@ export const getActiveRiddles = async (req, res) => {
             return aIndex - bIndex;
         });
 
-        // Filter and return only the ones not purely 'locked' to avoid sending inactive ones
-        const visibleRiddles = riddlesWithStatus.filter(r => r.status !== 'locked');
+        // The user wants to see the locked riddles in the UI to know they exist
+        const visibleRiddles = riddlesWithStatus;
 
-        // Note: we're returning { riddles, canUnlockPenalty, penaltyDeadline } here, whereas before we just returned an array. Let's send an object.
+        // Note: we're returning { riddles, canUnlockPenalty, penaltyDeadline } here
         res.status(200).json({
             riddles: visibleRiddles,
             canUnlockPenalty,

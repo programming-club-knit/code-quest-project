@@ -7,7 +7,7 @@ const systemSchema = new mongoose.Schema({
         default: 'not_started'
     },
     contestStartTime: { type: Date },
-    timeoutMinutes: { type: Number, default: 30 },
+    timeoutMinutes: { type: Number, default: 10 },
     penaltyMinutes: { type: Number, default: 15 },
     contestDurationMinutes: { type: Number, default: 120 }
 }, { timestamps: true });

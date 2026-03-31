@@ -13,6 +13,7 @@ const AdminRiddles = () => {
         title: "",
         description: "",
         answer: "",
+        points: 50,
         isActive: true
     });
 
@@ -43,7 +44,7 @@ const AdminRiddles = () => {
     const handleReset = () => {
         setIsEditing(false);
         setCurrentRiddleId(null);
-        setFormData({ title: "", description: "", answer: "", isActive: true });
+        setFormData({ title: "", description: "", answer: "", points: 50, isActive: true });
     };
 
     const handleEdit = (riddle) => {
@@ -53,6 +54,7 @@ const AdminRiddles = () => {
             title: riddle.title,
             description: riddle.description,
             answer: riddle.answer,
+            points: riddle.points || 50,
             isActive: riddle.isActive
         });
     };
@@ -167,6 +169,11 @@ const AdminRiddles = () => {
                         <div className="mb-3">
                             <label className="font-bold text-[#444] mb-1 block">Answer (exact match required):</label>
                             <input type="text" name="answer" value={formData.answer} onChange={handleInputChange} required className="w-full border border-[#ccc] p-1" />
+                        </div>
+
+                        <div className="mb-3">
+                            <label className="font-bold text-[#444] mb-1 block">Points:</label>
+                            <input type="number" name="points" value={formData.points || 50} onChange={handleInputChange} required className="w-full border border-[#ccc] p-1" />
                         </div>
 
                         <div className="mb-3">

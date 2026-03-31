@@ -126,9 +126,21 @@ const ContestPage = () => {
                                                 </td>
                                                 <td className="py-2 px-3 border-r border-[#eee]">
                                                     {riddle.status === 'permanently_locked' ? (
-                                                        <span className="text-[#888] line-through font-bold text-left cursor-not-allowed" title="Failed to solve in time">
+                                                        <button
+                                                            onClick={() => toast.error("This riddle is permanently locked as you didn't solve it in time.")}
+                                                            className="text-[#888] line-through font-bold text-left cursor-not-allowed"
+                                                            title="Failed to solve in time"
+                                                        >
                                                             {riddle.title}
-                                                        </span>
+                                                        </button>
+                                                    ) : riddle.status === 'locked' ? (
+                                                        <button
+                                                            onClick={() => toast.error("This riddle is locked. Solve the previous ones to unlock it!")}
+                                                            className="text-[#888] font-bold text-left cursor-not-allowed flex items-center gap-1"
+                                                            title="Solve previous riddles to unlock"
+                                                        >
+                                                            <span>🔒 {riddle.title}</span>
+                                                        </button>
                                                     ) : (
                                                         <button
                                                             onClick={() => navigate(`/riddle/${riddle._id}`)}
@@ -146,7 +158,9 @@ const ContestPage = () => {
                                                     {riddle.status === 'solved' ? (
                                                         <span className="text-[#00a900] font-bold">Solved</span>
                                                     ) : riddle.status === 'permanently_locked' ? (
-                                                        <span className="text-[#cc0000] font-bold">Locked</span>
+                                                        <span className="text-[#cc0000] font-bold">Failed</span>
+                                                    ) : riddle.status === 'locked' ? (
+                                                        <span className="text-[#888] font-bold">Locked</span>
                                                     ) : (
                                                         <span className="text-[#888]">-</span>
                                                     )}

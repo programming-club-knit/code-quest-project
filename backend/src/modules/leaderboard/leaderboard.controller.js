@@ -1,6 +1,7 @@
 import Team from '../../models/Team.js';
 import Submission from '../../models/Submission.js';
 import Problem from '../../models/Problem.js';
+import Riddle from '../../models/Riddle.js';
 
 let cachedLeaderboard = null;
 let lastCacheTime = 0;
@@ -13,12 +14,18 @@ export const getLeaderboard = async (req, res) => {
             return res.status(200).json(cachedLeaderboard);
         }
 
-        const teams = await Team.find({ isVerified: true, isDisqualified: false }).select('_id teamName');
+        const teams = await Team.find({ isVerified: true, isDisqualified: false }).select('_id teamName solvedRiddles');
         const activeProblems = await Problem.find({ isActive: true }).select('_id title points');
+        const activeRiddles = await Riddle.find({ isActive: true }).select('_id points');
 
         const problemPoints = {};
         activeProblems.forEach(p => {
             problemPoints[p._id.toString()] = p.points;
+        });
+
+        const riddlePoints = {};
+        activeRiddles.forEach(r => {
+            riddlePoints[r._id.toString()] = r.points || 50; // default 50 if missing
         });
 
         const leaderboard = [];
@@ -32,6 +39,14 @@ export const getLeaderboard = async (req, res) => {
             const failedCounts = {};
 
             const PENALTY_PER_FAIL = 15;
+
+            // Add points for solved riddles
+            if (team.solvedRiddles && team.solvedRiddles.length > 0) {
+                team.solvedRiddles.forEach(rId => {
+                    const points = riddlePoints[rId.toString()] || 0;
+                    totalScore += points;
+                });
+            }
 
             for (const sub of allSubmissions) {
                 const pId = sub.problemId.toString();

@@ -2,6 +2,7 @@ import Team from '../../models/Team.js';
 import Submission from '../../models/Submission.js';
 import Problem from '../../models/Problem.js';
 import Riddle from '../../models/Riddle.js';
+import System from '../../models/System.js';
 
 let cachedLeaderboard = null;
 let lastCacheTime = 0;
@@ -14,7 +15,10 @@ export const getLeaderboard = async (req, res) => {
             return res.status(200).json(cachedLeaderboard);
         }
 
-        const teams = await Team.find({ isVerified: true, isDisqualified: false }).select('_id teamName solvedRiddles');
+        const system = await System.findOne({});
+        const PENALTY_PER_FAIL = system?.wrongSubmissionPenalty ?? 15;
+
+        const teams = await Team.find({ isVerified: true, isDisqualified: false, isDeleted: { $ne: true } }).select('_id teamName solvedRiddles');
         const activeProblems = await Problem.find({ isActive: true }).select('_id title points');
         const activeRiddles = await Riddle.find({ isActive: true }).select('_id points');
 
@@ -37,8 +41,6 @@ export const getLeaderboard = async (req, res) => {
             let latestSolveTime = 0;
             const problemsSolvedByTeam = {};
             const failedCounts = {};
-
-            const PENALTY_PER_FAIL = 15;
 
             // Add points for solved riddles
             if (team.solvedRiddles && team.solvedRiddles.length > 0) {

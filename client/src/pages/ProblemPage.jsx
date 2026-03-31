@@ -182,7 +182,8 @@ const ProblemPage = () => {
             }
         } catch (error) {
             console.error('Error submitting solution:', error);
-            toast.error(error.response?.data?.error || 'Failed to submit code');
+            const msg = error.response?.data?.error || 'Failed to submit code';
+            toast.error(msg);
         } finally {
             setSubmitting(false);
         }

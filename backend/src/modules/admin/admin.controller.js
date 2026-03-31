@@ -6,7 +6,7 @@ import Problem from '../../models/Problem.js';
 
 export const getAllTeams = async (req, res) => {
     try {
-        const teams = await Team.find().select('-password').sort({ createdAt: -1 });
+        const teams = await Team.find({ isDeleted: { $ne: true } }).select('-password').sort({ createdAt: -1 });
         res.status(200).json(teams);
     } catch (error) {
         console.error('Error fetching teams:', error);
@@ -66,6 +66,19 @@ export const disqualifyTeam = async (req, res) => {
             return res.status(404).json({ message: 'Team not found' });
         }
         res.status(200).json({ message: 'Team marked as disqualified.', team });
+    } catch (error) {
+        res.status(400).json({ error });
+    }
+};
+
+export const deleteTeam = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const team = await Team.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
+        if (!team) {
+            return res.status(404).json({ message: 'Team not found' });
+        }
+        res.status(200).json({ message: 'Team sorted as soft deleted.', team });
     } catch (error) {
         res.status(400).json({ error });
     }
@@ -194,8 +207,8 @@ export const getDashboardAnalytics = async (req, res) => {
             activeProblems,
             activeRiddles
         ] = await Promise.all([
-            Team.countDocuments(),
-            Team.countDocuments({ isVerified: true }),
+            Team.countDocuments({ isDeleted: { $ne: true } }),
+            Team.countDocuments({ isVerified: true, isDeleted: { $ne: true } }),
             Submission.countDocuments(),
             Problem.countDocuments(),
             Riddle.countDocuments({ isActive: true })

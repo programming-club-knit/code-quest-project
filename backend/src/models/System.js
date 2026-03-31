@@ -9,7 +9,8 @@ const systemSchema = new mongoose.Schema({
     contestStartTime: { type: Date },
     timeoutMinutes: { type: Number, default: 10 },
     penaltyMinutes: { type: Number, default: 15 },
-    contestDurationMinutes: { type: Number, default: 120 }
+    contestDurationMinutes: { type: Number, default: 120 },
+    wrongSubmissionPenalty: { type: Number, default: 15 }
 }, { timestamps: true });
 
 // There should only be one system settings document.

@@ -243,6 +243,14 @@ export const solveRiddle = async (req, res) => {
             return res.status(403).json({ error: 'Contest is not currently running. Submissions are disabled.' });
         }
 
+        // Check if contest time has ended
+        if (system.contestStartTime && system.contestDurationMinutes) {
+            const endTime = new Date(system.contestStartTime.getTime() + system.contestDurationMinutes * 60000);
+            if (new Date() > endTime) {
+                return res.status(403).json({ error: 'Contest time has run out. Submissions are no longer accepted.' });
+            }
+        }
+
         let team = await Team.findById(req.team.teamId);
 
         // Sync before checking

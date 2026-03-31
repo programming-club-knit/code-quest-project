@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
+import Team from '../models/Team.js';
 
-export const verifyToken = (req, res, next) => {
+export const verifyToken = async (req, res, next) => {
     const token = req.cookies.token;
 
     if (!token) {
@@ -9,6 +10,13 @@ export const verifyToken = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
+
+        // Also ensure the team hasn't been soft-deleted or disqualified since token was issued
+        const team = await Team.findById(decoded.teamId).select('isDeleted isDisqualified');
+        if (!team || team.isDeleted || team.isDisqualified) {
+            return res.status(403).json({ error: 'Team access has been revoked.' });
+        }
+
         req.team = decoded;
         next();
     } catch (error) {

@@ -16,7 +16,7 @@ export const getSystemStatus = async (req, res) => {
 
 export const updateSystemStatus = async (req, res) => {
     try {
-        const { status, timeoutMinutes, penaltyMinutes, contestDurationMinutes } = req.body;
+        const { status, timeoutMinutes, penaltyMinutes, contestDurationMinutes, wrongSubmissionPenalty } = req.body;
         const validStatuses = ['not_started', 'running', 'paused', 'ended'];
 
         let system = await System.findOne({});
@@ -35,6 +35,7 @@ export const updateSystemStatus = async (req, res) => {
         if (timeoutMinutes !== undefined) system.timeoutMinutes = timeoutMinutes;
         if (penaltyMinutes !== undefined) system.penaltyMinutes = penaltyMinutes;
         if (contestDurationMinutes !== undefined) system.contestDurationMinutes = contestDurationMinutes;
+        if (wrongSubmissionPenalty !== undefined) system.wrongSubmissionPenalty = wrongSubmissionPenalty;
 
         await system.save();
 

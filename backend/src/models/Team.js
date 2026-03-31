@@ -50,6 +50,10 @@ const teamSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
     riddleSequence: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Riddle'

@@ -9,6 +9,7 @@ const AdminDashboard = () => {
     const [contestStatus, setContestStatus] = useState('loading...');
     const [timeoutMinutes, setTimeoutMinutes] = useState(30);
     const [penaltyMinutes, setPenaltyMinutes] = useState(15);
+    const [wrongSubmissionPenalty, setWrongSubmissionPenalty] = useState(15);
     const [contestDurationMinutes, setContestDurationMinutes] = useState(120);
 
     const [stats, setStats] = useState({
@@ -30,6 +31,7 @@ const AdminDashboard = () => {
             setContestStatus(statusRes.data.contestStatus);
             if (statusRes.data.timeoutMinutes) setTimeoutMinutes(statusRes.data.timeoutMinutes);
             if (statusRes.data.penaltyMinutes) setPenaltyMinutes(statusRes.data.penaltyMinutes);
+            if (statusRes.data.wrongSubmissionPenalty !== undefined) setWrongSubmissionPenalty(statusRes.data.wrongSubmissionPenalty);
             if (statusRes.data.contestDurationMinutes) setContestDurationMinutes(statusRes.data.contestDurationMinutes);
 
             if (statsRes.data) {
@@ -71,6 +73,7 @@ const AdminDashboard = () => {
             await axios.put(`${API_BASE_URL}/system/status`, {
                 timeoutMinutes: Number(timeoutMinutes),
                 penaltyMinutes: Number(penaltyMinutes),
+                wrongSubmissionPenalty: Number(wrongSubmissionPenalty),
                 contestDurationMinutes: Number(contestDurationMinutes)
             }, { withCredentials: true });
             toast.success('Timers updated successfully');
@@ -172,6 +175,10 @@ const AdminDashboard = () => {
                                 <div>
                                     <label className="text-[12px] font-bold">Strict Action Time Limit (mins):</label>
                                     <input type="number" className="w-full border border-[#ccc] px-2 py-1 mt-1 text-[13px]" value={penaltyMinutes} onChange={e => setPenaltyMinutes(e.target.value)} />
+                                </div>
+                                <div>
+                                    <label className="text-[12px] font-bold">Wrong Submission Penalty (pts):</label>
+                                    <input type="number" className="w-full border border-[#ccc] px-2 py-1 mt-1 text-[13px]" value={wrongSubmissionPenalty} onChange={e => setWrongSubmissionPenalty(e.target.value)} />
                                 </div>
                                 <button onClick={updateTimers} className="bg-[#e4e4e4] border border-[#b9b9b9] hover:bg-[#d0d0d0] px-[12px] py-[4px] mt-1 text-[#222] font-semibold text-[12px] rounded-sm transition-colors">
                                     Save Timers

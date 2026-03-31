@@ -36,6 +36,10 @@ const AdminTeams = () => {
             endpoint = `/admin/teams/${id}/unverify`;
         } else if (action === "DISQUALIFY") {
             if (!window.confirm("Are you sure you want to disqualify this team?")) return;
+            endpoint = `/admin/teams/${id}/disqualify`;
+            method = "put";
+        } else if (action === "DELETE") {
+            if (!window.confirm("Are you sure you want to permanently soft-delete this team?")) return;
             endpoint = `/admin/teams/${id}`;
             method = "delete";
         }
@@ -127,8 +131,9 @@ const AdminTeams = () => {
                                                             <button onClick={() => handleAction(team._id, "UNVERIFY")} className="text-[#ff8c00] hover:underline hover:text-[#cc7000]">Unverify</button>
                                                         )}
                                                         {status !== "Disqualified" && (
-                                                            <button onClick={() => handleAction(team._id, "DISQUALIFY")} className="text-[#cc0000] hover:underline hover:text-[#990000]">Disqualify</button>
+                                                            <button onClick={() => handleAction(team._id, "DISQUALIFY")} className="text-[#ff8c00] hover:underline hover:text-[#cc7000]">Disqualify</button>
                                                         )}
+                                                        <button onClick={() => handleAction(team._id, "DELETE")} className="text-[#cc0000] hover:underline hover:text-[#990000]">Delete</button>
                                                     </td>
                                                 </tr>
                                                 {isExpanded && (

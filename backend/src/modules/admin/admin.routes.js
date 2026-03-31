@@ -5,6 +5,7 @@ import {
     verifyTeam,
     unverifyTeam,
     disqualifyTeam,
+    deleteTeam,
     createRiddle,
     getAllRiddles,
     updateRiddle,
@@ -54,7 +55,7 @@ router.put('/teams/:id/unverify', unverifyTeam);
 
 // Disqualify / Delete team
 router.put('/teams/:id/disqualify', disqualifyTeam);
-router.delete('/teams/:id', disqualifyTeam);
+router.delete('/teams/:id', deleteTeam);
 
 // Riddle Management
 router.post('/riddles', createRiddle);

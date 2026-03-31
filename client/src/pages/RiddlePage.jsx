@@ -106,7 +106,8 @@ const RiddlePage = () => {
             }
         } catch (error) {
             console.error("Error verifying answer", error);
-            toast.error("Error verifying answer");
+            const msg = error.response?.data?.error || "Error verifying answer";
+            toast.error(msg);
         }
     };
 

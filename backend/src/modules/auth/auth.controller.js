@@ -49,7 +49,7 @@ export const loginTeam = async (req, res) => {
         const { teamLeaderEmail, password } = req.body;
 
         const team = await Team.findOne({ teamLeaderEmail });
-        if (!team) {
+        if (!team || team.isDeleted) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 

@@ -14,6 +14,7 @@ const AdminSubmissions = () => {
     const [loading, setLoading] = useState(true);
     const [searchTeam, setSearchTeam] = useState('');
     const [searchProblem, setSearchProblem] = useState('');
+    const [selectedSubmission, setSelectedSubmission] = useState(null);
 
     const fetchSubmissions = async () => {
         try {
@@ -89,12 +90,13 @@ const AdminSubmissions = () => {
                                     <th className="py-2 px-2 font-bold">Verdict</th>
                                     <th className="py-2 px-2 font-bold w-[80px]">Time</th>
                                     <th className="py-2 px-2 font-bold w-[80px]">Memory</th>
+                                    <th className="py-2 px-2 font-bold min-w-[80px]">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {filteredSubmissions.map((sub, index) => (
                                     <tr key={sub._id} className={`border-b border-[#eee] ${index % 2 === 0 ? 'bg-white' : 'bg-[#fafafa]'}`}>
-                                        <td className="py-[6px] px-2 text-[#0000cc] hover:underline cursor-pointer">
+                                        <td className="py-[6px] px-2 text-[#0000cc] hover:underline cursor-pointer" onClick={() => setSelectedSubmission(sub)}>
                                             {sub._id.substring(sub._id.length - 8)}
                                         </td>
                                         <td className="py-[6px] px-2 text-[#888]">
@@ -114,6 +116,9 @@ const AdminSubmissions = () => {
                                         </td>
                                         <td className="py-[6px] px-2 text-[#222]">{sub.executionTime ? `${sub.executionTime} ms` : '-'}</td>
                                         <td className="py-[6px] px-2 text-[#222]">{sub.memory ? `${sub.memory} KB` : '-'}</td>
+                                        <td className="py-[6px] px-2">
+                                            <button className="text-[#0000cc] hover:underline whitespace-nowrap" onClick={() => setSelectedSubmission(sub)}>View Code</button>
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -124,6 +129,66 @@ const AdminSubmissions = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Submission Code Modal */}
+            {selectedSubmission && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white border border-[#b9b9b9] rounded-sm shadow-lg w-full max-w-3xl flex flex-col max-h-[90vh]">
+                        <div className="border-b border-[#b9b9b9] bg-[#e1e1e1] px-4 py-2 flex justify-between items-center text-[#333]">
+                            <h2 className="font-bold text-[14px]">
+                                Code Submission - {selectedSubmission.teamId?.teamName}
+                            </h2>
+                            <button
+                                onClick={() => setSelectedSubmission(null)}
+                                className="text-xl font-bold text-[#cc0000] hover:text-[#990000] leading-none"
+                            >&times;</button>
+                        </div>
+
+                        <div className="p-4 flex-1 overflow-y-auto w-full text-[13px]">
+                            <div className="mb-4 grid grid-cols-2 gap-4">
+                                <div>
+                                    <p><strong>Problem:</strong> {selectedSubmission.problemId?.title}</p>
+                                    <p><strong>Language:</strong> {languageMap[selectedSubmission.languageId]}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p><strong>Verdict:</strong> <span className={getVerdictStyle(selectedSubmission.verdict)}>{selectedSubmission.verdict}</span></p>
+                                    <p><strong>Time/Mem:</strong> {selectedSubmission.executionTime || '-'}ms / {selectedSubmission.memory || '-'}KB</p>
+                                </div>
+                            </div>
+
+                            <h3 className="font-bold mb-2 border-b border-[#ccc] pb-1">Submitted Code:</h3>
+                            <pre className="bg-[#1e1e1e] text-[#d4d4d4] p-3 rounded overflow-x-auto text-[12px] font-mono whitespace-pre-wrap break-all">
+                                <code>{selectedSubmission.code || 'No code available'}</code>
+                            </pre>
+
+                            {selectedSubmission.results && selectedSubmission.results.length > 0 && (
+                                <div className="mt-4">
+                                    <h3 className="font-bold mb-2 border-b border-[#ccc] pb-1">Test Results:</h3>
+                                    <div className="space-y-2">
+                                        {selectedSubmission.results.map((res, i) => (
+                                            <div key={i} className={`p-2 border rounded ${res.passed ? 'border-[#00a900] bg-[#e6ffe6]' : 'border-[#cc0000] bg-[#ffe6e6]'}`}>
+                                                <p><strong>Test {i + 1}:</strong> {res.passed ? 'Passed' : 'Failed'}</p>
+                                                {!res.passed && !res.isHidden && (
+                                                    <div className="text-xs mt-1 grid grid-cols-2 gap-2">
+                                                        <div><strong className="block text-gray-700">Input:</strong> <pre className="bg-white border p-1 rounded overflow-x-auto">{res.input}</pre></div>
+                                                        <div>
+                                                            <strong className="block text-gray-700">Expected:</strong> <pre className="bg-white border p-1 rounded overflow-x-auto">{res.expectedOutput}</pre>
+                                                            <strong className="block text-gray-700 mt-1">Actual:</strong> <pre className="bg-white border p-1 rounded overflow-x-auto">{res.actualOutput}</pre>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {!res.passed && res.isHidden && (
+                                                    <p className="text-xs italic text-gray-500 mt-1">Hidden test case</p>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

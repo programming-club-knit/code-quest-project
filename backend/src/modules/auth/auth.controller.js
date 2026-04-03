@@ -53,9 +53,9 @@ export const loginTeam = async (req, res) => {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
-        if (!team.isVerified) {
-            return res.status(403).json({ error: 'Team is not verified by administration yet.' });
-        }
+        // if (!team.isVerified) {
+        //     return res.status(403).json({ error: 'Team is not verified by administration yet.' });
+        // }
 
         const isPasswordValid = await bcrypt.compare(password, team.password);
         if (!isPasswordValid) {

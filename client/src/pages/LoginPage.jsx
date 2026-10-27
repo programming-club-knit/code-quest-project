@@ -6,10 +6,18 @@ import { useAuth } from '../context/AuthContext';
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
     const { login } = useAuth();
 
     const handleLogin = async (e) => {
+        if(isSubmitting){
+            toast.error("Prevoius submit is under process")
+            return
+        } 
+            
+        setIsSubmitting(true)
+        setIsSubmitting(true)
         e.preventDefault();
         try {
             const data = await login(email, password);
@@ -22,6 +30,8 @@ const LoginPage = () => {
             console.error('Login error:', err);
             const errorMsg = err.response?.data?.error || err.response?.data?.message || 'Login failed. Please check your credentials.';
             toast.error(errorMsg);
+        } finally{
+            setIsSubmitting(false);
         }
     };
 
@@ -107,7 +117,7 @@ const LoginPage = () => {
                                     type="submit"
                                     className="bg-[#e4e4e4] border border-[#b9b9b9] hover:bg-[#d0d0d0] px-[16px] py-[4px] sm:py-[2px] text-[#222] font-semibold text-[13px] rounded-sm transition-colors active:bg-[#c0c0c0] w-full sm:w-auto"
                                 >
-                                    Login
+                                    {!isSubmitting ? "Login":"Loading..."}
                                 </button>
                             </div>
                         </div>
